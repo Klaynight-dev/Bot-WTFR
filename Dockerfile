@@ -5,8 +5,12 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml tsconfig.json ./
+COPY prisma ./prisma
+COPY prisma.config.ts ./
 
 COPY src ./src
+COPY prisma ./prisma
+COPY prisma.config.ts ./
 
 RUN pnpm install --frozen-lockfile
 RUN pnpm prisma:generate
