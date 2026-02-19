@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import fs from 'fs'
 import path from 'path'
+import prisma from './prisma'
 import {
   Client,
   GatewayIntentBits,
@@ -59,18 +60,21 @@ client.on('interactionCreate', async (interaction: any) => {
 
       // Pagination (public message buttons)
       if (id === 'pseudos_prev' || id === 'pseudos_next') {
-        const pseudos = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'pseudos.json'), 'utf8') || '[]')
-        const msgData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'messageId.json'), 'utf8') || '{}')
+        const pseudos = await prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
+        const msgRow = await prisma.messageState.findFirst()
         const perPage = 5
         const totalPages = Math.max(1, Math.ceil(pseudos.length / perPage))
-        let page = typeof msgData.page === 'number' ? msgData.page : 0
+        let page = typeof msgRow?.page === 'number' ? msgRow.page : 0
 
         page = id === 'pseudos_next' ? Math.min(totalPages - 1, page + 1) : Math.max(0, page - 1)
 
         const payload = buildPseudosPage(pseudos, page, perPage)
 
-        msgData.page = payload.page
-        fs.writeFileSync(path.join(process.cwd(), 'messageId.json'), JSON.stringify(msgData, null, 2))
+        if (msgRow) {
+          await prisma.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } })
+        } else {
+          await prisma.messageState.create({ data: { page: payload.page } })
+        }
 
         await interaction.update({ embeds: payload.embeds, components: payload.components })
         return
@@ -79,7 +83,7 @@ client.on('interactionCreate', async (interaction: any) => {
       // Goto from search results (still supported)
       if (id.startsWith('pseudos_goto_')) {
         const targetId = id.replace('pseudos_goto_', '')
-        const pseudos = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'pseudos.json'), 'utf8') || '[]')
+        const pseudos = await prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
         const idx = pseudos.findIndex((u: any) => u.id === targetId)
         if (idx === -1) {
           await interaction.reply({ content: 'Utilisateur introuvable dans la liste.', ephemeral: true })
@@ -91,16 +95,15 @@ client.on('interactionCreate', async (interaction: any) => {
         const payload = buildPseudosPage(pseudos, page, perPage)
 
         // edit public embed
-        const msgData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'messageId.json'), 'utf8') || '{}')
-        if (msgData.channelId && msgData.messageId) {
+        const msgRow = await prisma.messageState.findFirst()
+        if (msgRow?.channelId && msgRow?.messageId) {
           try {
-            const ch = await client.channels.fetch(msgData.channelId).catch(() => null)
+            const ch = await client.channels.fetch(msgRow.channelId).catch(() => null)
             if (ch) {
-              const msg = await (ch as any).messages.fetch(msgData.messageId).catch(() => null)
+              const msg = await (ch as any).messages.fetch(msgRow.messageId).catch(() => null)
               if (msg) {
                 await msg.edit({ embeds: payload.embeds, components: payload.components })
-                msgData.page = payload.page
-                fs.writeFileSync(path.join(process.cwd(), 'messageId.json'), JSON.stringify(msgData, null, 2))
+                await prisma.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } })
               }
             }
           } catch (err) {
@@ -126,7 +129,7 @@ client.on('interactionCreate', async (interaction: any) => {
     if (interaction.isModalSubmit && interaction.isModalSubmit()) {
       if (interaction.customId === 'pseudos_modal_search') {
         const q = interaction.fields.getTextInputValue('query').trim()
-        const pseudos = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'pseudos.json'), 'utf8') || '[]')
+        const pseudos = await prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
         const matches: any[] = []
 
         const mentionMatch = q.match(/^<@!?(\d+)>$/) || q.match(/^(\d+)$/)

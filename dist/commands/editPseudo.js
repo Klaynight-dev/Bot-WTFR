@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = void 0;
 exports.execute = execute;
 const discord_js_1 = require("discord.js");
-const fs_1 = __importDefault(require("fs"));
+const prisma_1 = __importDefault(require("../prisma"));
 const updateMessage_1 = require("../functions/updateMessage");
 exports.data = new discord_js_1.SlashCommandBuilder()
     .setName('editpseudo')
@@ -17,8 +17,7 @@ async function execute(interaction, client) {
     const affichage = interaction.options.getString('affichage');
     const roblox = interaction.options.getString('roblox');
     const user = interaction.user;
-    const data = JSON.parse(fs_1.default.readFileSync('./pseudos.json', 'utf8') || '[]');
-    const existing = data.find(u => u.id === user.id);
+    const existing = await prisma_1.default.pseudo.findUnique({ where: { id: user.id } });
     if (!existing) {
         const errOpts = { content: "❌ Tu n’as pas enregistré de pseudo.", ephemeral: true };
         try {
@@ -34,8 +33,7 @@ async function execute(interaction, client) {
             return;
         }
     }
-    existing.display = affichage;
-    existing.roblox = roblox;
+    await prisma_1.default.pseudo.update({ where: { id: user.id }, data: { display: affichage, roblox } });
     const replyOptions = { content: '✅ Pseudos modifiés !', ephemeral: true };
     try {
         if (!interaction.deferred && !interaction.replied) {
@@ -47,18 +45,6 @@ async function execute(interaction, client) {
     }
     catch (err) {
         console.error('interaction reply failed:', err);
-    }
-    try {
-        fs_1.default.writeFileSync('./pseudos.json', JSON.stringify(data, null, 2));
-    }
-    catch (err) {
-        console.error('failed to write pseudos.json:', err);
-        try {
-            if (interaction.replied || interaction.deferred)
-                await interaction.followUp({ content: "❌ Erreur lors de l'écriture.", ephemeral: true });
-        }
-        catch (_) { }
-        return;
     }
     (0, updateMessage_1.updateGlobalMessage)(client);
 }

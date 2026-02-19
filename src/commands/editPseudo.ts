@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
-import fs from 'fs'
+import prisma from '../prisma'
 import { updateGlobalMessage } from '../functions/updateMessage'
 
 export const data = new SlashCommandBuilder()
@@ -13,9 +13,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   const roblox = interaction.options.getString('roblox') as string
   const user = interaction.user
 
-  const data = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]') as any[]
-
-  const existing = data.find(u => u.id === user.id)
+  const existing = await prisma.pseudo.findUnique({ where: { id: user.id } })
 
   if (!existing) {
     const errOpts = { content: "❌ Tu n’as pas enregistré de pseudo.", ephemeral: true }
@@ -31,8 +29,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     }
   }
 
-  existing.display = affichage
-  existing.roblox = roblox
+  await prisma.pseudo.update({ where: { id: user.id }, data: { display: affichage, roblox } })
 
   const replyOptions = { content: '✅ Pseudos modifiés !', ephemeral: true }
   try {
@@ -43,14 +40,6 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     }
   } catch (err) {
     console.error('interaction reply failed:', err)
-  }
-
-  try {
-    fs.writeFileSync('./pseudos.json', JSON.stringify(data, null, 2))
-  } catch (err) {
-    console.error('failed to write pseudos.json:', err)
-    try { if (interaction.replied || interaction.deferred) await interaction.followUp({ content: "❌ Erreur lors de l'écriture.", ephemeral: true }) } catch (_) {}
-    return
   }
 
   updateGlobalMessage(client)

@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = void 0;
 exports.execute = execute;
 const discord_js_1 = require("discord.js");
-const fs_1 = __importDefault(require("fs"));
+const prisma_1 = __importDefault(require("../prisma"));
 const updateMessage_1 = require("../functions/updateMessage");
 exports.data = new discord_js_1.SlashCommandBuilder()
     .setName('setpseudo')
@@ -17,14 +17,20 @@ async function execute(interaction, client) {
     const affichage = interaction.options.getString('affichage');
     const roblox = interaction.options.getString('roblox');
     const user = interaction.user;
-    const data = JSON.parse(fs_1.default.readFileSync('./pseudos.json', 'utf8') || '[]');
-    const existing = data.find(u => u.id === user.id);
-    if (existing) {
-        existing.display = affichage;
-        existing.roblox = roblox;
+    try {
+        await prisma_1.default.pseudo.upsert({
+            where: { id: user.id },
+            update: { display: affichage, roblox },
+            create: { id: user.id, display: affichage, roblox }
+        });
     }
-    else {
-        data.push({ id: user.id, display: affichage, roblox });
+    catch (err) {
+        console.error('prisma upsert pseudo failed:', err);
+        try {
+            await interaction.reply({ content: "❌ Erreur lors de l'enregistrement.", ephemeral: true });
+        }
+        catch (_) { }
+        return;
     }
     const replyOptions = { content: '✅ Pseudo enregistré !', ephemeral: true };
     try {
@@ -37,18 +43,6 @@ async function execute(interaction, client) {
     }
     catch (err) {
         console.error('interaction reply failed:', err);
-    }
-    try {
-        fs_1.default.writeFileSync('./pseudos.json', JSON.stringify(data, null, 2));
-    }
-    catch (err) {
-        console.error('failed to write pseudos.json:', err);
-        try {
-            if (interaction.replied || interaction.deferred)
-                await interaction.followUp({ content: "❌ Erreur lors de l'enregistrement.", ephemeral: true });
-        }
-        catch (_) { }
-        return;
     }
     (0, updateMessage_1.updateGlobalMessage)(client);
 }

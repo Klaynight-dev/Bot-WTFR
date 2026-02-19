@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("BDD_URL")
+}
+
+model Pseudo {
+  id        String   @id
+  display   String
+  roblox    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Warning {
+  id          Int      @id @default(autoincrement())
+  userId      String
+  moderatorId String
+  reason      String
+  date        DateTime @default(now())
+}
+
+model MessageState {
+  id        Int     @id @default(autoincrement())
+  channelId String?
+  messageId String?
+  page      Int?
+}

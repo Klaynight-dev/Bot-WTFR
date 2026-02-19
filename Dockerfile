@@ -16,6 +16,7 @@ COPY package.json pnpm-lock.yaml tsconfig.json ./
 COPY src ./src
 
 RUN pnpm install --frozen-lockfile
+RUN pnpm prisma:generate
 RUN pnpm run build
 
 # ----- final image -----
@@ -29,9 +30,8 @@ ENV NODE_ENV=production
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 
-# copy compiled output and runtime data files
+# copy compiled output
 COPY --from=builder /app/dist ./dist
-COPY pseudos.json messageId.json warnings.json ./
 
 # run as non-root (node user exists in official node images)
 USER node

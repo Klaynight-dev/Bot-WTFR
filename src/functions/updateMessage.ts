@@ -1,5 +1,5 @@
-import fs from 'fs'
 import { EmbedBuilder, Client, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
+import prisma from '../prisma'
 
 export function buildPseudosPage(pseudos: any[] = [], page = 0, perPage = 5) {
   const total = Array.isArray(pseudos) ? pseudos.length : 0
@@ -29,12 +29,12 @@ export function buildPseudosPage(pseudos: any[] = [], page = 0, perPage = 5) {
 
 export async function updateGlobalMessage(client: Client) {
   try {
-    const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]')
-    const msgData = JSON.parse(fs.readFileSync('./messageId.json', 'utf8') || '{}') || {}
-    const messageId = msgData && msgData.messageId
-    const storedChannelId = msgData && msgData.channelId
+    const pseudos = await prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
+    const msgRow = await prisma.messageState.findFirst()
+    const messageId = msgRow?.messageId
+    const storedChannelId = msgRow?.channelId
     const preferredChannelId = process.env.CHANNEL_ID || storedChannelId
-    const currentPage = typeof msgData.page === 'number' ? msgData.page : 0
+    const currentPage = typeof msgRow?.page === 'number' ? msgRow.page : 0
 
     const payload = buildPseudosPage(pseudos, currentPage)
 
@@ -47,8 +47,7 @@ export async function updateGlobalMessage(client: Client) {
             const msg = await (ch as any).messages.fetch(messageId).catch(() => null)
             if (msg) {
               await msg.edit({ embeds: payload.embeds, components: payload.components })
-              msgData.page = payload.page
-              fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
+              if (msgRow) await prisma.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } })
               return
             }
           }
@@ -63,9 +62,11 @@ export async function updateGlobalMessage(client: Client) {
           const msg = await (channel as any).messages.fetch(messageId).catch(() => null)
           if (msg) {
             await msg.edit({ embeds: payload.embeds, components: payload.components })
-            msgData.channelId = (channel as any).id
-            msgData.page = payload.page
-            fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
+            if (msgRow) {
+              await prisma.messageState.update({ where: { id: msgRow.id }, data: { channelId: (channel as any).id, page: payload.page } })
+            } else {
+              await prisma.messageState.create({ data: { channelId: (channel as any).id, page: payload.page } })
+            }
             return
           }
         } catch (err) {
@@ -95,10 +96,11 @@ export async function updateGlobalMessage(client: Client) {
     }
 
     const newMsg = await targetChannel.send({ embeds: payload.embeds, components: payload.components })
-    msgData.messageId = newMsg.id
-    msgData.channelId = targetChannel.id
-    msgData.page = payload.page
-    fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
+    if (msgRow) {
+      await prisma.messageState.update({ where: { id: msgRow.id }, data: { messageId: newMsg.id, channelId: targetChannel.id, page: payload.page } })
+    } else {
+      await prisma.messageState.create({ data: { messageId: newMsg.id, channelId: targetChannel.id, page: payload.page } })
+    }
   } catch (err) {
     console.error('updateGlobalMessage error:', err)
   }

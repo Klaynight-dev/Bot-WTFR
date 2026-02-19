@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const prisma_1 = __importDefault(require("./prisma"));
 const discord_js_1 = require("discord.js");
 const updateMessage_1 = require("./functions/updateMessage");
 const client = new discord_js_1.Client({ intents: [discord_js_1.GatewayIntentBits.Guilds] });
@@ -45,22 +46,26 @@ client.on('interactionCreate', async (interaction) => {
             const id = interaction.customId;
             // Pagination (public message buttons)
             if (id === 'pseudos_prev' || id === 'pseudos_next') {
-                const pseudos = JSON.parse(fs_1.default.readFileSync(path_1.default.join(process.cwd(), 'pseudos.json'), 'utf8') || '[]');
-                const msgData = JSON.parse(fs_1.default.readFileSync(path_1.default.join(process.cwd(), 'messageId.json'), 'utf8') || '{}');
+                const pseudos = await prisma_1.default.pseudo.findMany({ orderBy: { createdAt: 'asc' } });
+                const msgRow = await prisma_1.default.messageState.findFirst();
                 const perPage = 5;
                 const totalPages = Math.max(1, Math.ceil(pseudos.length / perPage));
-                let page = typeof msgData.page === 'number' ? msgData.page : 0;
+                let page = typeof msgRow?.page === 'number' ? msgRow.page : 0;
                 page = id === 'pseudos_next' ? Math.min(totalPages - 1, page + 1) : Math.max(0, page - 1);
                 const payload = (0, updateMessage_1.buildPseudosPage)(pseudos, page, perPage);
-                msgData.page = payload.page;
-                fs_1.default.writeFileSync(path_1.default.join(process.cwd(), 'messageId.json'), JSON.stringify(msgData, null, 2));
+                if (msgRow) {
+                    await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } });
+                }
+                else {
+                    await prisma_1.default.messageState.create({ data: { page: payload.page } });
+                }
                 await interaction.update({ embeds: payload.embeds, components: payload.components });
                 return;
             }
             // Goto from search results (still supported)
             if (id.startsWith('pseudos_goto_')) {
                 const targetId = id.replace('pseudos_goto_', '');
-                const pseudos = JSON.parse(fs_1.default.readFileSync(path_1.default.join(process.cwd(), 'pseudos.json'), 'utf8') || '[]');
+                const pseudos = await prisma_1.default.pseudo.findMany({ orderBy: { createdAt: 'asc' } });
                 const idx = pseudos.findIndex((u) => u.id === targetId);
                 if (idx === -1) {
                     await interaction.reply({ content: 'Utilisateur introuvable dans la liste.', ephemeral: true });
@@ -70,16 +75,15 @@ client.on('interactionCreate', async (interaction) => {
                 const page = Math.floor(idx / perPage);
                 const payload = (0, updateMessage_1.buildPseudosPage)(pseudos, page, perPage);
                 // edit public embed
-                const msgData = JSON.parse(fs_1.default.readFileSync(path_1.default.join(process.cwd(), 'messageId.json'), 'utf8') || '{}');
-                if (msgData.channelId && msgData.messageId) {
+                const msgRow = await prisma_1.default.messageState.findFirst();
+                if (msgRow?.channelId && msgRow?.messageId) {
                     try {
-                        const ch = await client.channels.fetch(msgData.channelId).catch(() => null);
+                        const ch = await client.channels.fetch(msgRow.channelId).catch(() => null);
                         if (ch) {
-                            const msg = await ch.messages.fetch(msgData.messageId).catch(() => null);
+                            const msg = await ch.messages.fetch(msgRow.messageId).catch(() => null);
                             if (msg) {
                                 await msg.edit({ embeds: payload.embeds, components: payload.components });
-                                msgData.page = payload.page;
-                                fs_1.default.writeFileSync(path_1.default.join(process.cwd(), 'messageId.json'), JSON.stringify(msgData, null, 2));
+                                await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } });
                             }
                         }
                     }
@@ -103,7 +107,7 @@ client.on('interactionCreate', async (interaction) => {
         if (interaction.isModalSubmit && interaction.isModalSubmit()) {
             if (interaction.customId === 'pseudos_modal_search') {
                 const q = interaction.fields.getTextInputValue('query').trim();
-                const pseudos = JSON.parse(fs_1.default.readFileSync(path_1.default.join(process.cwd(), 'pseudos.json'), 'utf8') || '[]');
+                const pseudos = await prisma_1.default.pseudo.findMany({ orderBy: { createdAt: 'asc' } });
                 const matches = [];
                 const mentionMatch = q.match(/^<@!?(\d+)>$/) || q.match(/^(\d+)$/);
                 if (mentionMatch) {
