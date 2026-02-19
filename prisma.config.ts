@@ -4,7 +4,7 @@ import { defineConfig, env } from "prisma/config";
 
 let dbUrl: string | undefined;
 try {
-  dbUrl = env("BDD_URL");
+  dbUrl = env("DATABASE_URL");
 } catch (err) {
   // env() throws when the variable is missing — tolerate that and continue.
   dbUrl = undefined;
