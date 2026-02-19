@@ -26,21 +26,27 @@ client.once('clientReady', () => {
 });
 client.on('interactionCreate', async (interaction) => {
     try {
+        console.log(`[interaction] id=${interaction.id} type=${interaction.type || 'unknown'} user=${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} channel=${interaction.channelId || 'N/A'}`);
         // Chat commands
         if (interaction.isChatInputCommand && interaction.isChatInputCommand()) {
+            console.log(`[interaction] ChatInputCommand /${interaction.commandName} from ${interaction.user?.tag || interaction.user?.id} in guild=${interaction.guild?.id || 'DM'} channel=${interaction.channelId || 'N/A'}`);
             const command = client.commands.get(interaction.commandName);
-            if (!command)
+            if (!command) {
+                console.warn(`[interaction] Command not found: ${interaction.commandName}`);
                 return;
+            }
             try {
                 await command.execute(interaction, client);
+                console.log(`[command] /${interaction.commandName} executed successfully by ${interaction.user?.tag || interaction.user?.id}`);
             }
             catch (err) {
-                console.error(err);
+                console.error(`[command] /${interaction.commandName} execution error:`, err);
             }
             return;
         }
         // Button interactions (legacy/public message buttons are mostly disabled now)
         if (interaction.isButton && interaction.isButton()) {
+            console.log(`[interaction] Button press customId=${interaction.customId} by ${interaction.user?.tag || interaction.user?.id} in guild=${interaction.guild?.id || 'DM'}`);
             const id = interaction.customId;
             // Pagination (public message buttons)
             if (id === 'pseudos_prev' || id === 'pseudos_next') {
@@ -103,6 +109,7 @@ client.on('interactionCreate', async (interaction) => {
         }
         // Modal submit (search)
         if (interaction.isModalSubmit && interaction.isModalSubmit()) {
+            console.log(`[interaction] Modal submit customId=${interaction.customId} by ${interaction.user?.tag || interaction.user?.id}`);
             if (interaction.customId === 'pseudos_modal_search') {
                 const q = interaction.fields.getTextInputValue('query').trim();
                 const pseudos = await prisma_1.default.pseudo.findMany({ orderBy: { createdAt: 'asc' } });

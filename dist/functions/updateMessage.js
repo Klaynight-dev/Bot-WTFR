@@ -39,6 +39,7 @@ async function updateGlobalMessage(client) {
         const storedChannelId = msgRow?.channelId;
         const preferredChannelId = process.env.CHANNEL_ID || storedChannelId;
         const currentPage = typeof msgRow?.page === 'number' ? msgRow.page : 0;
+        console.log(`[updateGlobalMessage] start — pseudos=${pseudos.length} page=${currentPage} preferredChannel=${preferredChannelId} messageId=${messageId}`);
         const payload = buildPseudosPage(pseudos, currentPage);
         // try éditer le message existant (préférer channel sauvegardé)
         if (messageId) {
@@ -48,6 +49,7 @@ async function updateGlobalMessage(client) {
                     if (ch && typeof ch.messages?.fetch === 'function') {
                         const msg = await ch.messages.fetch(messageId).catch(() => null);
                         if (msg) {
+                            console.log(`[updateGlobalMessage] editing message ${messageId} in channel ${ch.id}`);
                             await msg.edit({ embeds: payload.embeds, components: payload.components });
                             if (msgRow?.id) {
                                 await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } });
@@ -69,6 +71,7 @@ async function updateGlobalMessage(client) {
                 try {
                     const msg = await channel.messages.fetch(messageId).catch(() => null);
                     if (msg) {
+                        console.log(`[updateGlobalMessage] found message ${messageId} in channel ${channel.id} — editing`);
                         await msg.edit({ embeds: payload.embeds, components: payload.components });
                         if (msgRow?.id) {
                             await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { channelId: channel.id, page: payload.page } });
@@ -105,6 +108,7 @@ async function updateGlobalMessage(client) {
             if (!targetChannel)
                 return;
         }
+        console.log(`[updateGlobalMessage] creating new message in channel ${targetChannel.id}`);
         const newMsg = await targetChannel.send({ embeds: payload.embeds, components: payload.components });
         if (msgRow?.id) {
             await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { messageId: newMsg.id, channelId: targetChannel.id, page: payload.page } });

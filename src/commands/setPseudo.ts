@@ -16,6 +16,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   const affichage = interaction.options.getString('affichage') as string
   const roblox = interaction.options.getString('roblox') as string
   const user = interaction.user
+  console.log(`[cmd:setpseudo] /setpseudo by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} affichage=${affichage} roblox=${roblox}`)
 
   try {
     await prisma.pseudo.upsert({

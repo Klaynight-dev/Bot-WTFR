@@ -8,6 +8,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const user = interaction.options.getUser('utilisateur', true)
+  console.log(`[cmd:unmute] /unmute by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`)
 
   if (!interaction.guild) return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', ephemeral: true })
 

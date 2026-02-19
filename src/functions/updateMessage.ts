@@ -41,6 +41,8 @@ export async function updateGlobalMessage(client: Client) {
     const preferredChannelId = process.env.CHANNEL_ID || storedChannelId
     const currentPage = typeof msgRow?.page === 'number' ? msgRow.page : 0
 
+    console.log(`[updateGlobalMessage] start — pseudos=${pseudos.length} page=${currentPage} preferredChannel=${preferredChannelId} messageId=${messageId}`)
+
     const payload = buildPseudosPage(pseudos, currentPage)
 
     // try éditer le message existant (préférer channel sauvegardé)
@@ -51,6 +53,7 @@ export async function updateGlobalMessage(client: Client) {
           if (ch && typeof (ch as any).messages?.fetch === 'function') {
             const msg = await (ch as any).messages.fetch(messageId).catch(() => null)
             if (msg) {
+              console.log(`[updateGlobalMessage] editing message ${messageId} in channel ${(ch as any).id}`)
               await msg.edit({ embeds: payload.embeds, components: payload.components })
               if (msgRow?.id) {
                 await prisma.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } })
@@ -70,6 +73,7 @@ export async function updateGlobalMessage(client: Client) {
         try {
           const msg = await (channel as any).messages.fetch(messageId).catch(() => null)
           if (msg) {
+            console.log(`[updateGlobalMessage] found message ${messageId} in channel ${(channel as any).id} — editing`)
             await msg.edit({ embeds: payload.embeds, components: payload.components })
             if (msgRow?.id) {
               await prisma.messageState.update({ where: { id: msgRow.id }, data: { channelId: (channel as any).id, page: payload.page } })
@@ -104,6 +108,7 @@ export async function updateGlobalMessage(client: Client) {
       if (!targetChannel) return
     }
 
+    console.log(`[updateGlobalMessage] creating new message in channel ${targetChannel.id}`)
     const newMsg = await targetChannel.send({ embeds: payload.embeds, components: payload.components })
     if (msgRow?.id) {
       await prisma.messageState.update({ where: { id: msgRow.id }, data: { messageId: newMsg.id, channelId: targetChannel.id, page: payload.page } })

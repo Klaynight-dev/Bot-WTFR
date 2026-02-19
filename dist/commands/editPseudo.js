@@ -17,6 +17,7 @@ async function execute(interaction, client) {
     const affichage = interaction.options.getString('affichage');
     const roblox = interaction.options.getString('roblox');
     const user = interaction.user;
+    console.log(`[cmd:editpseudo] /editpseudo by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} affichage=${affichage} roblox=${roblox}`);
     const existing = await prisma_1.default.pseudo.findUnique({ where: { id: user.id } });
     if (!existing) {
         const errOpts = { content: "❌ Tu n’as pas enregistré de pseudo.", ephemeral: true };

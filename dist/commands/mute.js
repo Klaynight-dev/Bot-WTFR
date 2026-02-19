@@ -14,6 +14,7 @@ async function execute(interaction) {
     const user = interaction.options.getUser('utilisateur', true);
     const minutes = interaction.options.getInteger('minutes') || 10;
     const reason = interaction.options.getString('raison') || 'Aucune raison fournie';
+    console.log(`[cmd:mute] /mute by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} minutes=${minutes} reason=${reason}`);
     if (!interaction.guild)
         return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', ephemeral: true });
     const member = await interaction.guild.members.fetch(user.id).catch(() => null);

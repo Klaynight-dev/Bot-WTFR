@@ -9,6 +9,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDescription('Envoyer (ou recréer) le message public des pseudos')
     .setDefaultMemberPermissions(discord_js_1.PermissionFlagsBits.ManageGuild);
 async function execute(interaction, client) {
+    console.log(`[cmd:send-pseudo-msg] /send-pseudo-msg by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'}`);
     try {
         await (0, updateMessage_1.updateGlobalMessage)(client);
         await interaction.reply({ content: '✅ Message public envoyé / mis à jour.', ephemeral: true });

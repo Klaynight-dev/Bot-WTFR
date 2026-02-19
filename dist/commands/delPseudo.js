@@ -10,6 +10,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDefaultMemberPermissions(discord_js_1.PermissionFlagsBits.Administrator);
 async function execute(interaction) {
     const user = interaction.options.getUser('utilisateur');
+    console.log(`[cmd:delpseudo] /delpseudo by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`);
     const member = await interaction.guild.members.fetch(user.id);
     try {
         await member.setNickname(null);

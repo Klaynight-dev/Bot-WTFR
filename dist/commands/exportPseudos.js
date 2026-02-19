@@ -12,6 +12,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDescription('Télécharger le fichier pseudos.json')
     .setDefaultMemberPermissions(discord_js_1.PermissionFlagsBits.Administrator);
 async function execute(interaction) {
+    console.log(`[cmd:exportpseudos] /exportpseudos by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'}`);
     const pseudos = await prisma_1.default.pseudo.findMany({ orderBy: { createdAt: 'asc' } });
     const json = JSON.stringify(pseudos, null, 2);
     const buffer = Buffer.from(json, 'utf8');

@@ -16,6 +16,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
 async function execute(interaction) {
     const user = interaction.options.getUser('utilisateur', true);
     const reason = interaction.options.getString('raison', true);
+    console.log(`[cmd:warn] /warn by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} reason=${reason}`);
     await prisma_1.default.warning.create({ data: { userId: user.id, moderatorId: interaction.user.id, reason } });
     await interaction.reply({ content: `⚠️ ${user.tag} averti.`, ephemeral: true });
 }

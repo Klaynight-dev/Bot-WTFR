@@ -7,6 +7,7 @@ export const data = new SlashCommandBuilder()
   .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
 
 export async function execute(interaction: ChatInputCommandInteraction, client: any) {
+  console.log(`[cmd:send-pseudo-msg] /send-pseudo-msg by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'}`)
   try {
     await updateGlobalMessage(client)
     await interaction.reply({ content: '✅ Message public envoyé / mis à jour.', ephemeral: true })

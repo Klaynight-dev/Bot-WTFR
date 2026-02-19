@@ -9,6 +9,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .addIntegerOption(opt => opt.setName('amount').setDescription('Nombre de messages (max 100)').setRequired(true))
     .setDefaultMemberPermissions(discord_js_1.PermissionFlagsBits.ManageMessages);
 async function execute(interaction) {
+    console.log(`[cmd:clear] /clear by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} amount=${interaction.options.getInteger('amount')}`);
     const amount = interaction.options.getInteger('amount', true);
     const channel = interaction.channel;
     if (!channel || typeof channel.bulkDelete !== 'function')

@@ -8,6 +8,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: any) {
   const user = interaction.options.getUser('utilisateur')
+  console.log(`[cmd:delpseudo] /delpseudo by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`)
   const member = await interaction.guild.members.fetch(user.id)
 
   try {

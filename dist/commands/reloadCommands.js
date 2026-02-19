@@ -20,6 +20,7 @@ function getCommandsDir() {
     return srcPath;
 }
 async function execute(interaction, client) {
+    console.log(`[cmd:reload-commands] /reload-commands by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'}`);
     const commandsDir = getCommandsDir();
     const files = fs_1.default.existsSync(commandsDir) ? fs_1.default.readdirSync(commandsDir).filter(f => f.endsWith('.js') || f.endsWith('.ts')) : [];
     // clear existing

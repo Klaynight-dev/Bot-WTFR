@@ -10,6 +10,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction) {
   const user = interaction.options.getUser('utilisateur', true)
   const reason = interaction.options.getString('raison') || 'Aucune raison fournie'
+  console.log(`[cmd:ban] /ban by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} reason=${reason}`)
 
   if (!interaction.guild) return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', ephemeral: true })
 

@@ -15,6 +15,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDefaultMemberPermissions(discord_js_1.PermissionFlagsBits.ManageGuild);
 async function execute(interaction, client) {
     const channel = interaction.options.getChannel('channel', true);
+    console.log(`[cmd:setchannel] /setchannel by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} -> targetChannel=${channel.id}`);
     const msgRow = await prisma_1.default.messageState.findFirst();
     if (msgRow) {
         await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { channelId: channel.id, messageId: null, page: 0 } });

@@ -7,6 +7,7 @@ export const data = new SlashCommandBuilder()
   .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  console.log(`[cmd:clear] /clear by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} amount=${interaction.options.getInteger('amount')}`)
   const amount = interaction.options.getInteger('amount', true)
   const channel = interaction.channel as any
   if (!channel || typeof channel.bulkDelete !== 'function') return interaction.reply({ content: 'Commande utilisable uniquement dans un salon texte.', ephemeral: true })

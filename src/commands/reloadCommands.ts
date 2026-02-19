@@ -15,6 +15,7 @@ function getCommandsDir() {
 }
 
 export async function execute(interaction: ChatInputCommandInteraction, client: any) {
+  console.log(`[cmd:reload-commands] /reload-commands by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'}`)
   const commandsDir = getCommandsDir()
   const files = fs.existsSync(commandsDir) ? fs.readdirSync(commandsDir).filter(f => f.endsWith('.js') || f.endsWith('.ts')) : []
 

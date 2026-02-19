@@ -10,6 +10,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDefaultMemberPermissions(discord_js_1.PermissionFlagsBits.ManageChannels);
 async function execute(interaction) {
     const channel = (interaction.options.getChannel('channel') || interaction.channel);
+    console.log(`[cmd:unlock] /unlock by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} targetChannel=${channel?.id || 'N/A'}`);
     if (!channel || !channel.permissionOverwrites)
         return interaction.reply({ content: 'Salon invalide.', ephemeral: true });
     try {

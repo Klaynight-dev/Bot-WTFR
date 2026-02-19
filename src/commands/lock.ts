@@ -8,6 +8,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const channel = (interaction.options.getChannel('channel') || interaction.channel) as any
+  console.log(`[cmd:lock] /lock by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} targetChannel=${channel?.id || 'N/A'}`)
   if (!channel || !channel.permissionOverwrites) return interaction.reply({ content: 'Salon invalide.', ephemeral: true })
 
   try {

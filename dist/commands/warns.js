@@ -14,6 +14,7 @@ exports.data = new discord_js_1.SlashCommandBuilder()
     .setDefaultMemberPermissions(discord_js_1.PermissionFlagsBits.KickMembers);
 async function execute(interaction) {
     const user = interaction.options.getUser('utilisateur') || interaction.user;
+    console.log(`[cmd:warns] /warns by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`);
     const userWarnings = await prisma_1.default.warning.findMany({ where: { userId: user.id }, orderBy: { date: 'desc' } });
     if (userWarnings.length === 0)
         return interaction.reply({ content: 'Aucun avertissement pour cet utilisateur.', ephemeral: true });

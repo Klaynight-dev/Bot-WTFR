@@ -10,6 +10,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction, client: any) {
   const channel = interaction.options.getChannel('channel', true)
+  console.log(`[cmd:setchannel] /setchannel by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} -> targetChannel=${channel.id}`)
 
   const msgRow = await prisma.messageState.findFirst()
   if (msgRow) {
