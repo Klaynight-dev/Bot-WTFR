@@ -1,0 +1,24 @@
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
+
+export const data = new SlashCommandBuilder()
+  .setName('unmute')
+  .setDescription('Retirer le timeout (unmute) d\'un membre')
+  .addUserOption(opt => opt.setName('utilisateur').setDescription('Membre à unmute').setRequired(true))
+  .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+
+export async function execute(interaction: ChatInputCommandInteraction) {
+  const user = interaction.options.getUser('utilisateur', true)
+
+  if (!interaction.guild) return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', ephemeral: true })
+
+  const member = await interaction.guild.members.fetch(user.id).catch(() => null)
+  if (!member) return interaction.reply({ content: 'Membre introuvable.', ephemeral: true })
+
+  try {
+    await (member as any).timeout(null)
+    await interaction.reply({ content: `✅ Timeout retiré pour ${user.tag}.`, ephemeral: true })
+  } catch (err) {
+    console.error(err)
+    await interaction.reply({ content: '❌ Impossible de retirer le timeout.', ephemeral: true })
+  }
+}

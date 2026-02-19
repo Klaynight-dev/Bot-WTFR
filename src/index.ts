@@ -1,6 +1,7 @@
-require('dotenv').config()
-
-const {
+import 'dotenv/config'
+import fs from 'fs'
+import path from 'path'
+import {
   Client,
   GatewayIntentBits,
   Collection,
@@ -11,34 +12,37 @@ const {
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder
-} = require('discord.js')
-const fs = require('fs')
-const { updateGlobalMessage, buildPseudosPage } = require('./functions/updateMessage')
+} from 'discord.js'
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] })
+import { updateGlobalMessage, buildPseudosPage } from './functions/updateMessage'
+
+type ExtendedClient = Client & { commands: Collection<string, any> }
+const client = new Client({ intents: [GatewayIntentBits.Guilds] }) as ExtendedClient
 
 client.commands = new Collection()
 
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`)
-  client.commands.set(command.data.name, command)
+const commandsPath = path.join(__dirname, 'commands')
+if (fs.existsSync(commandsPath)) {
+  const commandFiles = fs.readdirSync(commandsPath).filter(f => f.endsWith('.js') || f.endsWith('.ts'))
+  for (const file of commandFiles) {
+    // dynamic require works with compiled (dist) JS and with ts-node
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const command = require(path.join(commandsPath, file))
+    client.commands.set(command.data.name, command)
+  }
 }
 
 client.once('clientReady', () => {
-  console.log(`✅ Connecté en tant que ${client.user.tag}`)
+  console.log(`✅ Connecté en tant que ${client.user?.tag}`)
 
   updateGlobalMessage(client)
-
-  setInterval(() => {
-    updateGlobalMessage(client)
-  }, 14 * 24 * 60 * 60 * 1000)
+  setInterval(() => updateGlobalMessage(client), 14 * 24 * 60 * 60 * 1000)
 })
 
-client.on('interactionCreate', async interaction => {
+client.on('interactionCreate', async (interaction: any) => {
   try {
-    // Chat commands (existing)
-    if (interaction.isChatInputCommand()) {
+    // Chat commands
+    if (interaction.isChatInputCommand && interaction.isChatInputCommand()) {
       const command = client.commands.get(interaction.commandName)
       if (!command) return
       try {
@@ -49,14 +53,14 @@ client.on('interactionCreate', async interaction => {
       return
     }
 
-    // Button interactions (pagination / search / goto)
-    if (interaction.isButton()) {
+    // Button interactions (legacy/public message buttons are mostly disabled now)
+    if (interaction.isButton && interaction.isButton()) {
       const id = interaction.customId
 
-      // Pagination
+      // Pagination (public message buttons)
       if (id === 'pseudos_prev' || id === 'pseudos_next') {
-        const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]')
-        const msgData = JSON.parse(fs.readFileSync('./messageId.json', 'utf8') || '{}')
+        const pseudos = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'pseudos.json'), 'utf8') || '[]')
+        const msgData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'messageId.json'), 'utf8') || '{}')
         const perPage = 5
         const totalPages = Math.max(1, Math.ceil(pseudos.length / perPage))
         let page = typeof msgData.page === 'number' ? msgData.page : 0
@@ -66,19 +70,19 @@ client.on('interactionCreate', async interaction => {
         const payload = buildPseudosPage(pseudos, page, perPage)
 
         msgData.page = payload.page
-        fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
+        fs.writeFileSync(path.join(process.cwd(), 'messageId.json'), JSON.stringify(msgData, null, 2))
 
         await interaction.update({ embeds: payload.embeds, components: payload.components })
         return
       }
 
-      // Goto from search results
+      // Goto from search results (still supported)
       if (id.startsWith('pseudos_goto_')) {
         const targetId = id.replace('pseudos_goto_', '')
-        const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]')
-        const idx = pseudos.findIndex(u => u.id === targetId)
+        const pseudos = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'pseudos.json'), 'utf8') || '[]')
+        const idx = pseudos.findIndex((u: any) => u.id === targetId)
         if (idx === -1) {
-          await interaction.reply({ content: 'Utilisateur introuvable dans la liste.', flags: 64 })
+          await interaction.reply({ content: 'Utilisateur introuvable dans la liste.', ephemeral: true })
           return
         }
 
@@ -86,17 +90,17 @@ client.on('interactionCreate', async interaction => {
         const page = Math.floor(idx / perPage)
         const payload = buildPseudosPage(pseudos, page, perPage)
 
-        // edit public message
-        const msgData = JSON.parse(fs.readFileSync('./messageId.json', 'utf8') || '{}')
+        // edit public embed
+        const msgData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'messageId.json'), 'utf8') || '{}')
         if (msgData.channelId && msgData.messageId) {
           try {
             const ch = await client.channels.fetch(msgData.channelId).catch(() => null)
             if (ch) {
-              const msg = await ch.messages.fetch(msgData.messageId).catch(() => null)
+              const msg = await (ch as any).messages.fetch(msgData.messageId).catch(() => null)
               if (msg) {
                 await msg.edit({ embeds: payload.embeds, components: payload.components })
                 msgData.page = payload.page
-                fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
+                fs.writeFileSync(path.join(process.cwd(), 'messageId.json'), JSON.stringify(msgData, null, 2))
               }
             }
           } catch (err) {
@@ -104,7 +108,7 @@ client.on('interactionCreate', async interaction => {
           }
         }
 
-        await interaction.reply({ content: '✅ Affiché dans le listing public.', flags: 64 })
+        await interaction.reply({ content: '✅ Affiché dans le listing public.', ephemeral: true })
         return
       }
 
@@ -112,34 +116,36 @@ client.on('interactionCreate', async interaction => {
       if (id === 'pseudos_search') {
         const modal = new ModalBuilder().setCustomId('pseudos_modal_search').setTitle('Rechercher un pseudo')
         const input = new TextInputBuilder().setCustomId('query').setLabel('Discord / affichage / roblox').setStyle(TextInputStyle.Short).setRequired(true)
-        modal.addComponents(new ActionRowBuilder().addComponents(input))
+        modal.addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(input))
         await interaction.showModal(modal)
         return
       }
     }
 
     // Modal submit (search)
-    if (interaction.isModalSubmit()) {
+    if (interaction.isModalSubmit && interaction.isModalSubmit()) {
       if (interaction.customId === 'pseudos_modal_search') {
         const q = interaction.fields.getTextInputValue('query').trim()
-        const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]')
-        const matches = []
+        const pseudos = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'pseudos.json'), 'utf8') || '[]')
+        const matches: any[] = []
 
         const mentionMatch = q.match(/^<@!?(\d+)>$/) || q.match(/^(\d+)$/)
         if (mentionMatch) {
           const id = mentionMatch[1]
-          matches.push(...pseudos.filter(u => u.id === id))
+          matches.push(...pseudos.filter((u: any) => u.id === id))
         } else {
           const lower = q.toLowerCase()
-          matches.push(...pseudos.filter(u => (u.display || '').toLowerCase().includes(lower) || (u.roblox || '').toLowerCase().includes(lower)))
+          matches.push(...pseudos.filter((u: any) => (u.display || '').toLowerCase().includes(lower) || (u.roblox || '').toLowerCase().includes(lower)))
         }
 
         if (matches.length === 0) {
-          await interaction.reply({ content: 'Aucun résultat.', flags: 64 })
+          await interaction.reply({ content: 'Aucun résultat.', ephemeral: true })
           return
         }
 
-        const embed = new EmbedBuilder().setTitle(`Résultats pour "${q}"`).setColor(0x5865F2)
+        const embed = new EmbedBuilder()
+          .setTitle(`Résultats pour "${q}"`)
+          .setColor(0x5865F2)
           .setDescription(matches.map(u => `• <@${u.id}> — \`${u.display}\` • Roblox: [${u.roblox}](https://www.roblox.com/users/profile?username=${encodeURIComponent(u.roblox)})`).join('\n'))
           .setFooter({ text: `${matches.length} résultat(s)` })
 
@@ -150,11 +156,11 @@ client.on('interactionCreate', async interaction => {
           linkRow.addComponents(new ButtonBuilder().setLabel(`Profil Roblox #${i + 1}`).setStyle(ButtonStyle.Link).setURL(`https://www.roblox.com/users/profile?username=${encodeURIComponent(matches[i].roblox)}`))
         }
 
-        const components = []
-        if (gotoRow.components.length) components.push(gotoRow)
-        if (linkRow.components.length) components.push(linkRow)
+        const components = [] as any[]
+        if ((gotoRow as any).components.length) components.push(gotoRow)
+        if ((linkRow as any).components.length) components.push(linkRow)
 
-        await interaction.reply({ embeds: [embed], components, flags: 64 })
+        await interaction.reply({ embeds: [embed], components, ephemeral: true })
         return
       }
     }

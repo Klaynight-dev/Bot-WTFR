@@ -1,14 +1,7 @@
-const fs = require('fs')
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
+import fs from 'fs'
+import { EmbedBuilder, Client, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
 
-/**
- * Génère un embed paginé (sans composants) pour le message public
- * @param {Array} pseudos
- * @param {number} page
- * @param {number} perPage
- * @returns {{embeds: Array, page: number, totalPages: number}}
- */
-function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
+export function buildPseudosPage(pseudos: any[] = [], page = 0, perPage = 5) {
   const total = Array.isArray(pseudos) ? pseudos.length : 0
   const totalPages = Math.max(1, Math.ceil(total / perPage))
   page = Math.max(0, Math.min(page, totalPages - 1))
@@ -34,15 +27,10 @@ function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
   return { embeds: [embed], components: [row], page, totalPages }
 }
 
-/**
- * Met à jour le message global affichant les pseudos (utilise l'embed paginé)
- * Priorise le salon défini par `process.env.CHANNEL_ID` et sauvegarde `channelId` + `page`.
- * @param {import('discord.js').Client} client
- */
-async function updateGlobalMessage(client) {
+export async function updateGlobalMessage(client: Client) {
   try {
-    const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8'))
-    const msgData = JSON.parse(fs.readFileSync('./messageId.json', 'utf8')) || {}
+    const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]')
+    const msgData = JSON.parse(fs.readFileSync('./messageId.json', 'utf8') || '{}') || {}
     const messageId = msgData && msgData.messageId
     const storedChannelId = msgData && msgData.channelId
     const preferredChannelId = process.env.CHANNEL_ID || storedChannelId
@@ -55,8 +43,8 @@ async function updateGlobalMessage(client) {
       if (storedChannelId) {
         try {
           const ch = await client.channels.fetch(storedChannelId).catch(() => null)
-          if (ch && typeof ch.messages?.fetch === 'function') {
-            const msg = await ch.messages.fetch(messageId).catch(() => null)
+          if (ch && typeof (ch as any).messages?.fetch === 'function') {
+            const msg = await (ch as any).messages.fetch(messageId).catch(() => null)
             if (msg) {
               await msg.edit({ embeds: payload.embeds, components: payload.components })
               msgData.page = payload.page
@@ -70,12 +58,12 @@ async function updateGlobalMessage(client) {
       }
 
       for (const channel of client.channels.cache.values()) {
-        if (typeof channel.messages?.fetch !== 'function') continue
+        if (typeof (channel as any).messages?.fetch !== 'function') continue
         try {
-          const msg = await channel.messages.fetch(messageId).catch(() => null)
+          const msg = await (channel as any).messages.fetch(messageId).catch(() => null)
           if (msg) {
             await msg.edit({ embeds: payload.embeds, components: payload.components })
-            msgData.channelId = channel.id
+            msgData.channelId = (channel as any).id
             msgData.page = payload.page
             fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
             return
@@ -87,11 +75,11 @@ async function updateGlobalMessage(client) {
     }
 
     // créer un nouveau message si nécessaire
-    let targetChannel = null
+    let targetChannel: any = null
     if (preferredChannelId) {
       try {
         const ch = await client.channels.fetch(preferredChannelId).catch(() => null)
-        if (ch && ch.isTextBased && ch.permissionsFor?.(ch.guild?.members?.me).has('SendMessages')) {
+        if (ch && ch.isTextBased && (ch as any).permissionsFor?.(ch.guild?.members?.me).has?.('SendMessages' as any)) {
           targetChannel = ch
         }
       } catch (err) {
@@ -102,7 +90,7 @@ async function updateGlobalMessage(client) {
     if (!targetChannel) {
       const guild = client.guilds.cache.first()
       if (!guild) return
-      targetChannel = guild.channels.cache.find(ch => ch.isTextBased && ch.permissionsFor(guild.members.me).has('SendMessages'))
+      targetChannel = guild.channels.cache.find((ch: any) => ch.isTextBased && ch.permissionsFor(guild.members.me).has('SendMessages' as any))
       if (!targetChannel) return
     }
 
@@ -115,5 +103,3 @@ async function updateGlobalMessage(client) {
     console.error('updateGlobalMessage error:', err)
   }
 }
-
-module.exports = { updateGlobalMessage, buildPseudosPage }

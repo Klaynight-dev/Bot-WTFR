@@ -2,14 +2,22 @@
   "name": "wtfr-bot",
   "version": "1.0.0",
   "description": "Bot pseudo WTFR",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "node index.js",
-    "deploy": "node deploy-commands.js",
-    "go": "node index.js && node deploy-commands.js"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "deploy": "pnpm run build && node dist/deploy-commands.js",
+    "go": "pnpm run build && pnpm run start"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.6",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "@types/node": "^20.4.2"
   }
 }
