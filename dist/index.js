@@ -21,7 +21,19 @@ if (fs_1.default.existsSync(commandsPath)) {
 }
 client.once('clientReady', async () => {
     console.log(`✅ Connecté en tant que ${client.user?.tag}`);
-    await (0, updateMessage_1.updateGlobalMessage)(client);
+    try {
+        await prisma_1.default.$connect();
+        console.log('[prisma] connected to DB');
+    }
+    catch (err) {
+        console.error('[prisma] connection error:', err);
+    }
+    try {
+        await (0, updateMessage_1.updateGlobalMessage)(client);
+    }
+    catch (err) {
+        console.error('updateGlobalMessage (startup) failed:', err);
+    }
 });
 client.on('interactionCreate', async (interaction) => {
     try {

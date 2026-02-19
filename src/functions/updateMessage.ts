@@ -34,12 +34,18 @@ export function buildPseudosPage(pseudos: any[] = [], page = 0, perPage = 5) {
 export async function updateGlobalMessage(client: Client) {
   try {
     console.log('[updateGlobalMessage] invoked')
-    console.log('[updateGlobalMessage] fetching pseudos from DB...')
-    const pseudos = await getPseudos()
-    console.log(`[updateGlobalMessage] fetched pseudos=${pseudos.length}`)
+    console.log('[updateGlobalMessage] fetching pseudos from DB (timeout 5s)...')
+    const pseudos = await Promise.race([
+      getPseudos(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('getPseudos timed out after 5000ms')), 5000))
+    ]) as any[]
+    console.log(`[updateGlobalMessage] fetched pseudos=${Array.isArray(pseudos) ? pseudos.length : 'N/A'}`)
 
-    console.log('[updateGlobalMessage] fetching messageState from DB...')
-    const msgRow: any = await prisma.messageState.findFirst()
+    console.log('[updateGlobalMessage] fetching messageState from DB (timeout 5s)...')
+    const msgRow: any = await Promise.race([
+      prisma.messageState.findFirst(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('messageState.findFirst timed out after 5000ms')), 5000))
+    ])
     console.log(`[updateGlobalMessage] messageState=${JSON.stringify(msgRow)}`)
 
     const messageId = msgRow?.messageId
@@ -122,6 +128,8 @@ export async function updateGlobalMessage(client: Client) {
       await prisma.messageState.create({ data: { messageId: newMsg.id, channelId: targetChannel.id, page: payload.page } })
     }
   } catch (err) {
-    console.error('updateGlobalMessage error:', err)
+    console.error('updateGlobalMessage error:', err && (err.stack || err.message) ? (err.stack || err) : err)
+    // rethrow so callers (commands) can react and finish deferred replies
+    throw err
   }
 }

@@ -34,11 +34,17 @@ function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
 async function updateGlobalMessage(client) {
     try {
         console.log('[updateGlobalMessage] invoked');
-        console.log('[updateGlobalMessage] fetching pseudos from DB...');
-        const pseudos = await getPseudos();
-        console.log(`[updateGlobalMessage] fetched pseudos=${pseudos.length}`);
-        console.log('[updateGlobalMessage] fetching messageState from DB...');
-        const msgRow = await prisma_1.default.messageState.findFirst();
+        console.log('[updateGlobalMessage] fetching pseudos from DB (timeout 5s)...');
+        const pseudos = await Promise.race([
+            getPseudos(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('getPseudos timed out after 5000ms')), 5000))
+        ]);
+        console.log(`[updateGlobalMessage] fetched pseudos=${Array.isArray(pseudos) ? pseudos.length : 'N/A'}`);
+        console.log('[updateGlobalMessage] fetching messageState from DB (timeout 5s)...');
+        const msgRow = await Promise.race([
+            prisma_1.default.messageState.findFirst(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('messageState.findFirst timed out after 5000ms')), 5000))
+        ]);
         console.log(`[updateGlobalMessage] messageState=${JSON.stringify(msgRow)}`);
         const messageId = msgRow?.messageId;
         const storedChannelId = msgRow?.channelId;
@@ -123,6 +129,8 @@ async function updateGlobalMessage(client) {
         }
     }
     catch (err) {
-        console.error('updateGlobalMessage error:', err);
+        console.error('updateGlobalMessage error:', err && (err.stack || err.message) ? (err.stack || err) : err);
+        // rethrow so callers (commands) can react and finish deferred replies
+        throw err;
     }
 }

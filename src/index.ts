@@ -33,7 +33,19 @@ if (fs.existsSync(commandsPath)) {
 
 client.once('clientReady', async () => {
   console.log(`✅ Connecté en tant que ${client.user?.tag}`)
-  await updateGlobalMessage(client)
+
+  try {
+    await prisma.$connect()
+    console.log('[prisma] connected to DB')
+  } catch (err) {
+    console.error('[prisma] connection error:', err)
+  }
+
+  try {
+    await updateGlobalMessage(client)
+  } catch (err) {
+    console.error('updateGlobalMessage (startup) failed:', err)
+  }
 
 })
 
