@@ -11,6 +11,7 @@ COPY src ./src
 
 RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
+ARG BDD_URL
 RUN if [ -z "$BDD_URL" ]; then \
 			echo "Skipping prisma generate (no BDD_URL provided)"; \
 		else \
