@@ -16,8 +16,6 @@ if (connectionString) {
 else {
     const missingMsg = 'Environment variable BDD_URL is not set — Prisma is disabled.';
     // A proxy that returns async functions which reject with a helpful error when called.
-    // Allow explicitly-set properties on the proxy target (for example $connect/$disconnect)
-    // to be returned so lifecycle methods can be no-ops.
     const handler = {
         get: (target, prop) => {
             if (prop in target)

@@ -55,7 +55,7 @@ export async function updateGlobalMessage(client: Client) {
 
     const messageId = msgRow?.messageId
     const storedChannelId = msgRow?.channelId
-    const preferredChannelId = process.env.CHANNEL_ID || storedChannelId
+    const preferredChannelId = storedChannelId || process.env.CHANNEL_ID
     const currentPage = typeof msgRow?.page === 'number' ? msgRow.page : 0
 
     console.log(`[updateGlobalMessage] start — page=${currentPage} preferredChannel=${preferredChannelId} messageId=${messageId}`)
