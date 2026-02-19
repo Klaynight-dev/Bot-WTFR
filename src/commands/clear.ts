@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
+import { makeEmbed, replyEphemeralEmbed } from '../functions/respond'
 
 export const data = new SlashCommandBuilder()
   .setName('clear')

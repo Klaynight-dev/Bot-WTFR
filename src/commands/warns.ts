@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits, MessageFlags } from 'discord.js'
 import prisma from '../prisma'
+import { makeEmbed, replyEphemeralEmbed } from '../functions/respond' 
 
 export const data = new SlashCommandBuilder()
   .setName('warns')

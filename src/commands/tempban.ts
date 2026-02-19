@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
+import { makeEmbed, sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond' 
 
 export const data = new SlashCommandBuilder()
   .setName('tempban')

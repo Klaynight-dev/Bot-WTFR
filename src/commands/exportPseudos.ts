@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
 import prisma from '../prisma'
+import { makeEmbed } from '../functions/respond'
 
 export const data = new SlashCommandBuilder()
   .setName('exportpseudos')

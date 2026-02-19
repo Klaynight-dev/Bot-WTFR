@@ -8,6 +8,8 @@
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "deploy": "pnpm run build && node dist/deploy-commands.js",
+    "deploy:guild": "powershell -NoProfile -Command \"$env:DEPLOY_SCOPE='guild'; pnpm run deploy\"",
+    "deploy:global": "powershell -NoProfile -Command \"$env:DEPLOY_SCOPE='global'; pnpm run deploy\"",
     "go": "pnpm run build && pnpm run start",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",

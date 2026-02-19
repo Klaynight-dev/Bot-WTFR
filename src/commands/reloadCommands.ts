@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, Client, MessageFlags } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
+import { makeEmbed, replyEphemeralEmbed } from '../functions/respond' 
 
 export const data = new SlashCommandBuilder()
   .setName('reload-commands')

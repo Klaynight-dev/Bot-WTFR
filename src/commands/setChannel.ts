@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, ChannelType, MessageFlags } from 'discord.js'
 import prisma from '../prisma'
 import { updateGlobalMessage } from '../functions/updateMessage'
+import { makeEmbed } from '../functions/respond' 
 
 export const data = new SlashCommandBuilder()
   .setName('setchannel')

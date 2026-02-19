@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
 import prisma from '../prisma'
 import { updateGlobalMessage } from '../functions/updateMessage'
+import { makeEmbed, replyEphemeralEmbed } from '../functions/respond'
 
 export const data = new SlashCommandBuilder()
   .setName('editpseudo')
@@ -17,13 +18,8 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   const existing = await prisma.pseudo.findUnique({ where: { id: user.id } })
 
   if (!existing) {
-    const errOpts = { content: "❌ Tu n’as pas enregistré de pseudo.", ephemeral: true }
     try {
-      if (!interaction.deferred && !interaction.replied) {
-        return await interaction.reply(errOpts)
-      } else {
-        return await interaction.followUp(errOpts)
-      }
+      return await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: "Tu n’as pas enregistré de pseudo.", color: 0xFF0000 }))
     } catch (err) {
       console.error('interaction reply failed:', err)
       return
