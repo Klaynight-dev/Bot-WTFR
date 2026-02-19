@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js'
+import { makeEmbed, replyEphemeralEmbed } from '../functions/respond'
 
 export const data = new SlashCommandBuilder()
   .setName('delpseudo')
@@ -13,9 +14,9 @@ export async function execute(interaction: any) {
 
   try {
     await member.setNickname(null)
-    await interaction.reply(`✅ Pseudo de ${user} supprimé avec succès.`)
+    await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Pseudo supprimé', description: `Le pseudo de <@${user.id}> a été supprimé.`, color: 0x00AA00 }))
   } catch (error) {
-    await interaction.reply('❌ Erreur lors de la suppression du pseudo.')
+    await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Erreur lors de la suppression du pseudo.', color: 0xFF0000 }))
     console.error(error)
   }
 }

@@ -31,10 +31,10 @@ for (const file of commandFiles) {
 client.once('clientReady', () => {
   console.log(`✅ Connecté en tant que ${client.user.tag}`)
 
-  updateGlobalMessage(client, false)
+  updateGlobalMessage(client)
 
   setInterval(() => {
-    updateGlobalMessage(client, false)
+    updateGlobalMessage(client)
   }, 14 * 24 * 60 * 60 * 1000)
 })
 

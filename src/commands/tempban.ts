@@ -6,6 +6,7 @@ export const data = new SlashCommandBuilder()
   .addUserOption(opt => opt.setName('utilisateur').setDescription('Membre à bannir').setRequired(true))
   .addIntegerOption(opt => opt.setName('minutes').setDescription('Durée en minutes').setRequired(true))
   .addStringOption(opt => opt.setName('raison').setDescription('Raison'))
+  .addBooleanOption(opt => opt.setName('secret').setDescription('Envoyer en privé (oui)').setRequired(false))
   .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
 
 export async function execute(interaction: ChatInputCommandInteraction) {
@@ -14,11 +15,13 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const reason = interaction.options.getString('raison') || 'Aucune raison fournie'
   console.log(`[cmd:tempban] /tempban by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} minutes=${minutes} reason=${reason}`)
 
-  if (!interaction.guild) return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', flags: MessageFlags.Ephemeral })
+  const secret = interaction.options.getBoolean('secret') ?? false
+  if (!interaction.guild) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Commande utilisable uniquement en serveur.', color: 0xFF0000 }))
 
   try {
     await (interaction.guild.members as any).ban(user.id, { reason })
-    await interaction.reply({ content: `✅ ${user.tag} banni pour ${minutes} minute(s). (attention : ne survive pas au redémarrage du bot)`, flags: MessageFlags.Ephemeral })
+    const embed = makeEmbed({ title: 'Bannissement temporaire', description: `<@${user.id}> banni pour ${minutes} minute(s).`, color: 0xFF6600, fields: [{ name: 'Raison', value: reason }, { name: 'Modérateur', value: `<@${interaction.user.id}>` }] })
+    await sendPublicOrSecret(interaction, embed, secret)
 
     const ms = minutes * 60 * 1000
     setTimeout(async () => {
@@ -31,6 +34,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     }, ms)
   } catch (err) {
     console.error(err)
-    await interaction.reply({ content: '❌ Impossible de bannir ce membre.', flags: MessageFlags.Ephemeral })
+    return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Impossible de bannir ce membre.', color: 0xFF0000 }))
   }
 }

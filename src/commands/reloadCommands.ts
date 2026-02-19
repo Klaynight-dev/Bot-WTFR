@@ -36,5 +36,5 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     }
   }
 
-  await interaction.reply({ content: `✅ ${client.commands.size} commandes rechargées.`, flags: MessageFlags.Ephemeral })
+  await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Reload commands', description: `✅ ${client.commands.size} commandes rechargées.`, color: 0x5865F2 }))
 }

@@ -12,12 +12,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   console.log(`[cmd:warns] /warns by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`)
   const userWarnings = await prisma.warning.findMany({ where: { userId: user.id }, orderBy: { date: 'desc' } })
 
-  if (userWarnings.length === 0) return interaction.reply({ content: 'Aucun avertissement pour cet utilisateur.', flags: MessageFlags.Ephemeral })
+  if (userWarnings.length === 0) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Avertissements', description: 'Aucun avertissement pour cet utilisateur.', color: 0xFFA500 }))
 
   const embed = new EmbedBuilder()
     .setTitle(`Avertissements — ${user.tag}`)
     .setDescription(userWarnings.map((w: any, i: number) => `**${i + 1}.** ${w.reason} — <@${w.moderatorId}> (${new Date(w.date).toLocaleString()})`).join('\n'))
     .setColor(0xFFA500)
 
-  await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral })
+  await replyEphemeralEmbed(interaction, embed)
 }

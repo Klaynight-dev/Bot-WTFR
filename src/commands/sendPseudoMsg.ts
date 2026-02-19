@@ -12,9 +12,9 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     // deferring so interaction won't expire while updateGlobalMessage runs
     await interaction.deferReply({ flags: MessageFlags.Ephemeral })
     await updateGlobalMessage(client, true)
-    await interaction.editReply({ content: '✅ Message public envoyé / mis à jour.' })
+    await interaction.editReply({ embeds: [makeEmbed({ title: 'Message public', description: 'Message public envoyé / mis à jour.', color: 0x00AA00 })] })
   } catch (err) {
     console.error(err)
-    try { await interaction.editReply({ content: '❌ Échec lors de l’envoi du message public.' }) } catch (_) {}
+    try { await interaction.editReply({ embeds: [makeEmbed({ title: 'Erreur', description: 'Échec lors de l’envoi du message public.', color: 0xFF0000 })] }) } catch (_) {}
   }
 } 

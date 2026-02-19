@@ -10,13 +10,13 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   console.log(`[cmd:clear] /clear by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} amount=${interaction.options.getInteger('amount')}`)
   const amount = interaction.options.getInteger('amount', true)
   const channel = interaction.channel as any
-  if (!channel || typeof channel.bulkDelete !== 'function') return interaction.reply({ content: 'Commande utilisable uniquement dans un salon texte.', ephemeral: true })
+  if (!channel || typeof channel.bulkDelete !== 'function') return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Commande utilisable uniquement dans un salon texte.', color: 0xFF0000 }))
 
   try {
     const deleted = await channel.bulkDelete(Math.min(amount, 100), true)
-    await interaction.reply({ content: `✅ Supprimé ${deleted.size} message(s).`, ephemeral: true })
+    await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Messages supprimés', description: `✅ Supprimé ${deleted.size} message(s).`, color: 0x00AA00 }))
   } catch (err) {
     console.error(err)
-    await interaction.reply({ content: '❌ Échec lors de la suppression.', ephemeral: true })
+    await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Échec lors de la suppression.', color: 0xFF0000 }))
   }
 }

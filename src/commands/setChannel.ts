@@ -24,9 +24,9 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   try {
     await updateGlobalMessage(client, true)
-    await interaction.editReply({ content: `✅ Salon de listing défini sur <#${channel.id}>.` })
+    await interaction.editReply({ embeds: [makeEmbed({ title: 'Salon défini', description: `Salon de listing défini sur <#${channel.id}>.`, color: 0x00AA00 })] })
   } catch (err) {
     console.error(err)
-    try { await interaction.editReply({ content: "❌ Erreur lors de la mise à jour du message public." }) } catch (_) {}
+    try { await interaction.editReply({ embeds: [makeEmbed({ title: 'Erreur', description: "Erreur lors de la mise à jour du message public.", color: 0xFF0000 })] }) } catch (_) {}
   }
 }

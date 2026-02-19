@@ -9,14 +9,14 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction) {
   const channel = (interaction.options.getChannel('channel') || interaction.channel) as any
   console.log(`[cmd:unlock] /unlock by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} targetChannel=${channel?.id || 'N/A'}`)
-  if (!channel || !channel.permissionOverwrites) return interaction.reply({ content: 'Salon invalide.', flags: MessageFlags.Ephemeral })
+  if (!channel || !channel.permissionOverwrites) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Salon invalide.', color: 0xFF0000 }))
 
   try {
     // retirer l'override (mettre à null)
     await channel.permissionOverwrites.edit(interaction.guild!.roles.everyone, { SendMessages: null } as any)
-    await interaction.reply({ content: `🔓 Salon déverrouillé : ${channel.name}`, flags: MessageFlags.Ephemeral })
+    await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Salon déverrouillé', description: `🔓 ${channel.name}`, color: 0x00AA00 }))
   } catch (err) {
     console.error(err)
-    await interaction.reply({ content: '❌ Impossible de déverrouiller le salon.', flags: MessageFlags.Ephemeral })
+    await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Impossible de déverrouiller le salon.', color: 0xFF0000 }))
   }
 }

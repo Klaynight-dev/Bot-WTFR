@@ -32,12 +32,12 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   await prisma.pseudo.update({ where: { id: user.id }, data: { display: affichage, roblox } })
 
-  const replyOptions = { content: '✅ Pseudos modifiés !', ephemeral: true }
+  const embed = makeEmbed({ title: 'Pseudos modifiés', description: `Tes pseudos ont été mis à jour.`, color: 0x00AA00, fields: [{ name: 'Affichage', value: affichage }, { name: 'Roblox', value: roblox }] })
   try {
     if (!interaction.deferred && !interaction.replied) {
-      await interaction.reply(replyOptions)
+      await interaction.reply({ embeds: [embed], ephemeral: true })
     } else {
-      await interaction.followUp(replyOptions)
+      await interaction.followUp({ embeds: [embed], ephemeral: true })
     }
   } catch (err) {
     console.error('interaction reply failed:', err)
