@@ -9,10 +9,12 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction, client: any) {
   console.log(`[cmd:send-pseudo-msg] /send-pseudo-msg by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'}`)
   try {
+    // deferring so interaction won't expire while updateGlobalMessage runs
+    await interaction.deferReply({ ephemeral: true })
     await updateGlobalMessage(client)
-    await interaction.reply({ content: '✅ Message public envoyé / mis à jour.', ephemeral: true })
+    await interaction.editReply({ content: '✅ Message public envoyé / mis à jour.' })
   } catch (err) {
     console.error(err)
-    await interaction.reply({ content: '❌ Échec lors de l’envoi du message public.', ephemeral: true })
+    try { await interaction.editReply({ content: '❌ Échec lors de l’envoi du message public.' }) } catch (_) {}
   }
-}
+} 
