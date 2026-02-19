@@ -44,12 +44,24 @@ module.exports = {
             });
         }
 
-        fs.writeFileSync('./pseudos.json', JSON.stringify(data, null, 2));
+        const replyOptions = { content: "✅ Pseudo enregistré !", flags: 64 };
+        try {
+            if (!interaction.deferred && !interaction.replied) {
+                await interaction.reply(replyOptions);
+            } else {
+                await interaction.followUp(replyOptions);
+            }
+        } catch (err) {
+            console.error('interaction reply failed:', err);
+        }
 
-        await interaction.reply({
-            content: "✅ Pseudo enregistré !",
-            ephemeral: true
-        });
+        try {
+            fs.writeFileSync('./pseudos.json', JSON.stringify(data, null, 2));
+        } catch (err) {
+            console.error('failed to write pseudos.json:', err);
+            try { if (interaction.replied || interaction.deferred) await interaction.followUp({ content: '❌ Erreur lors de l\'enregistrement.', flags: 64 }); } catch (_) {}
+            return;
+        }
 
         updateGlobalMessage(client);
     }

@@ -34,21 +34,40 @@ module.exports = {
         const existing = data.find(u => u.id === user.id);
 
         if (!existing) {
-            return interaction.reply({
-                content: "❌ Tu n’as pas enregistré de pseudo.",
-                ephemeral: true
-            });
+            const errOpts = { content: "❌ Tu n’as pas enregistré de pseudo.", flags: 64 };
+            try {
+                if (!interaction.deferred && !interaction.replied) {
+                    return await interaction.reply(errOpts);
+                } else {
+                    return await interaction.followUp(errOpts);
+                }
+            } catch (err) {
+                console.error('interaction reply failed:', err);
+                return;
+            }
         }
 
         existing.display = affichage;
         existing.roblox = roblox;
 
-        fs.writeFileSync('./pseudos.json', JSON.stringify(data, null, 2));
+        const replyOptions = { content: "✅ Pseudos modifiés !", flags: 64 };
+        try {
+            if (!interaction.deferred && !interaction.replied) {
+                await interaction.reply(replyOptions);
+            } else {
+                await interaction.followUp(replyOptions);
+            }
+        } catch (err) {
+            console.error('interaction reply failed:', err);
+        }
 
-        await interaction.reply({
-            content: "✅ Pseudos modifiés !",
-            ephemeral: true
-        });
+        try {
+            fs.writeFileSync('./pseudos.json', JSON.stringify(data, null, 2));
+        } catch (err) {
+            console.error('failed to write pseudos.json:', err);
+            try { if (interaction.replied || interaction.deferred) await interaction.followUp({ content: '❌ Erreur lors de l\'écriture.', flags: 64 }); } catch (_) {}
+            return;
+        }
 
         updateGlobalMessage(client);
     }
