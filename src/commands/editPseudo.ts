@@ -30,11 +30,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   const embed = makeEmbed({ title: 'Pseudos modifiés', description: `Tes pseudos ont été mis à jour.`, color: 0x00AA00, fields: [{ name: 'Affichage', value: affichage }, { name: 'Roblox', value: roblox }] })
   try {
-    if (!interaction.deferred && !interaction.replied) {
-      await interaction.reply({ embeds: [embed], ephemeral: true })
-    } else {
-      await interaction.followUp({ embeds: [embed], ephemeral: true })
-    }
+    await replyEphemeralEmbed(interaction, embed)
   } catch (err) {
     console.error('interaction reply failed:', err)
   }

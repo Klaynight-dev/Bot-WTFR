@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
 import { updateGlobalMessage } from '../functions/updateMessage'
-import { makeEmbed } from '../functions/respond' 
+import { makeEmbed, replyEphemeralEmbed } from '../functions/respond' 
 
 export const data = new SlashCommandBuilder()
   .setName('send-pseudo-msg')
