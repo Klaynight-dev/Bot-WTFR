@@ -13,5 +13,5 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const json = JSON.stringify(pseudos, null, 2)
   const buffer = Buffer.from(json, 'utf8')
   const embed = makeEmbed({ title: 'Export des pseudos', description: `${pseudos.length} pseudo(s) exporté(s).`, color: 0x5865F2 })
-  await interaction.reply({ embeds: [embed], files: [{ attachment: buffer, name: 'pseudos.json' }], ephemeral: true })
+  await interaction.reply({ embeds: [embed], files: [{ attachment: buffer, name: 'pseudos.json' }], flags: 64 })
 }

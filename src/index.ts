@@ -112,7 +112,7 @@ client.on('interactionCreate', async (interaction: any) => {
         const pseudos = await prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
         const idx = pseudos.findIndex((u: any) => u.id === targetId)
         if (idx === -1) {
-          await interaction.reply({ content: 'Utilisateur introuvable dans la liste.', ephemeral: true })
+          await interaction.reply({ content: 'Utilisateur introuvable dans la liste.', flags: 64 })
           return
         }
 
@@ -143,7 +143,7 @@ client.on('interactionCreate', async (interaction: any) => {
           }
         }
 
-        await interaction.reply({ content: '✅ Affiché dans le listing public.', ephemeral: true })
+        await interaction.reply({ content: '✅ Affiché dans le listing public.', flags: 64 })
         return
       }
 
@@ -175,7 +175,7 @@ client.on('interactionCreate', async (interaction: any) => {
         }
 
         if (matches.length === 0) {
-          await interaction.reply({ content: 'Aucun résultat.', ephemeral: true })
+          await interaction.reply({ content: 'Aucun résultat.', flags: 64 })
           return
         }
 
@@ -200,9 +200,9 @@ client.on('interactionCreate', async (interaction: any) => {
 
         const branding = getBrandingAttachment()
         if (branding) {
-          await interaction.reply({ embeds: [embed], components, ephemeral: true, files: [{ attachment: branding.path, name: branding.name }] })
+          await interaction.reply({ embeds: [embed], components, flags: 64, files: [{ attachment: branding.path, name: branding.name }] })
         } else {
-          await interaction.reply({ embeds: [embed], components, ephemeral: true })
+          await interaction.reply({ embeds: [embed], components, flags: 64 })
         }
         return
       }

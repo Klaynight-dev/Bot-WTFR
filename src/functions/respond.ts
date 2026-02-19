@@ -73,13 +73,13 @@ async function _maybeAttachAndReply(interaction: ChatInputCommandInteraction, op
 export async function sendPublicOrSecret(interaction: ChatInputCommandInteraction, embed: EmbedBuilder, secret = false) {
   if (secret) {
     if (!interaction.deferred && !interaction.replied) {
-      return _maybeAttachAndReply(interaction, { embeds: [embed], ephemeral: true })
+      return _maybeAttachAndReply(interaction, { embeds: [embed], flags: 64 })
     } else {
       const branding = getBrandingAttachment()
-      if (!branding) return interaction.followUp({ embeds: [embed], ephemeral: true })
+      if (!branding) return interaction.followUp({ embeds: [embed], flags: 64 })
       const wantsAttachment = Boolean(embed.data?.footer?.icon_url?.startsWith?.('attachment://'))
-      if (!wantsAttachment) return interaction.followUp({ embeds: [embed], ephemeral: true })
-      return interaction.followUp({ embeds: [embed], ephemeral: true, files: [{ attachment: branding.path, name: branding.name }] })
+      if (!wantsAttachment) return interaction.followUp({ embeds: [embed], flags: 64 })
+      return interaction.followUp({ embeds: [embed], flags: 64, files: [{ attachment: branding.path, name: branding.name }] })
     }
   }
 
@@ -95,18 +95,17 @@ export async function sendPublicOrSecret(interaction: ChatInputCommandInteractio
       }
     } catch (err) {
       if (!interaction.deferred && !interaction.replied) {
-        return _maybeAttachAndReply(interaction, { embeds: [embed], ephemeral: true })
+        return _maybeAttachAndReply(interaction, { embeds: [embed], flags: 64 })
       } else {
         const branding = getBrandingAttachment()
-        if (!branding) return interaction.followUp({ embeds: [embed], ephemeral: true })
+        if (!branding) return interaction.followUp({ embeds: [embed], flags: 64 })
         const wantsAttachment = Boolean(embed.data?.footer?.icon_url?.startsWith?.('attachment://'))
-        if (!wantsAttachment) return interaction.followUp({ embeds: [embed], ephemeral: true })
-        return interaction.followUp({ embeds: [embed], ephemeral: true, files: [{ attachment: branding.path, name: branding.name }] })
+        if (!wantsAttachment) return interaction.followUp({ embeds: [embed], flags: 64 })
+        return interaction.followUp({ embeds: [embed], flags: 64, files: [{ attachment: branding.path, name: branding.name }] })
       }
-      return
     }
 
-    const confirm = { content: '✅ Message public envoyé.', ephemeral: true }
+    const confirm = { content: '✅ Message public envoyé.', flags: 64 }
     if (!interaction.deferred && !interaction.replied) {
       await interaction.reply(confirm)
     } else {
@@ -115,18 +114,18 @@ export async function sendPublicOrSecret(interaction: ChatInputCommandInteractio
     return
   }
 
-  return _maybeAttachAndReply(interaction, { embeds: [embed], ephemeral: true })
+  return _maybeAttachAndReply(interaction, { embeds: [embed], flags: 64 })
 }
 
 export async function replyEphemeralEmbed(interaction: ChatInputCommandInteraction, embed: EmbedBuilder) {
   // centralized ephemeral reply that attaches branding image when required
   if (!interaction.deferred && !interaction.replied) {
-    return _maybeAttachAndReply(interaction, { embeds: [embed], ephemeral: true })
+    return _maybeAttachAndReply(interaction, { embeds: [embed], flags: 64 })
   } else {
     const branding = getBrandingAttachment()
-    if (!branding) return interaction.followUp({ embeds: [embed], ephemeral: true })
+    if (!branding) return interaction.followUp({ embeds: [embed], flags: 64 })
     const wantsAttachment = Boolean(embed.data?.footer?.icon_url?.startsWith?.('attachment://'))
-    if (!wantsAttachment) return interaction.followUp({ embeds: [embed], ephemeral: true })
-    return interaction.followUp({ embeds: [embed], ephemeral: true, files: [{ attachment: branding.path, name: branding.name }] })
+    if (!wantsAttachment) return interaction.followUp({ embeds: [embed], flags: 64 })
+    return interaction.followUp({ embeds: [embed], flags: 64, files: [{ attachment: branding.path, name: branding.name }] })
   }
 }

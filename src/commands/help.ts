@@ -13,7 +13,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   if (query) {
     const cmd = (client as any).commands.get(query)
     if (!cmd) {
-      return interaction.reply({ content: "Commande introuvable.", ephemeral: true })
+      return interaction.reply({ content: "Commande introuvable.", flags: 64 })
     }
 
     const json = cmd.data?.toJSON ? cmd.data.toJSON() : cmd.data

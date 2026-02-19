@@ -1,6 +1,6 @@
 {
   "name": "wtfr-bot",
-  "version": "1.5.7",
+  "version": "1.5.8",
   "description": "Bot pseudo WTFR",
   "main": "dist/index.js",
   "scripts": {
