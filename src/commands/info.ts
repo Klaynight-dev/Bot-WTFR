@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
-import { makeEmbed, replyEphemeralEmbed } from '../functions/respond'
+import { makeEmbed, replyEmbed } from '../functions/respond'
 import pkg from '../../package.json'
 
 function formatUptime(ms = 0) {
@@ -31,5 +31,5 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     ]
   })
 
-  await replyEphemeralEmbed(interaction, embed)
+  await replyEmbed(interaction, embed)
 }

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, Client, MessageFlags } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
-import { makeEmbed, replyEphemeralEmbed } from '../functions/respond' 
+import { makeEmbed, replyEmbed } from '../functions/respond' 
 
 export const data = new SlashCommandBuilder()
   .setName('reload-commands')
@@ -37,5 +37,5 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     }
   }
 
-  await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Reload commands', description: `✅ ${client.commands.size} commandes rechargées.`, color: 0x5865F2 }))
+  await replyEmbed(interaction, makeEmbed({ title: 'Reload commands', description: `✅ ${client.commands.size} commandes rechargées.`, type: 'success' }))
 }

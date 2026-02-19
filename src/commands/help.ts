@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
-import { makeEmbed, replyEphemeralEmbed } from '../functions/respond'
+import { makeEmbed, replyEmbed } from '../functions/respond'
 
 export const data = new SlashCommandBuilder()
   .setName('help')
@@ -23,7 +23,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
       description: json.description || '—',
       fields: opts ? [{ name: 'Options', value: opts }] : undefined
     })
-    return replyEphemeralEmbed(interaction, embed)
+    return replyEmbed(interaction, embed)
   }
 
   // list all commands
@@ -33,6 +33,6 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     lines.push(`• /${json.name} — ${json.description || '—'}`)
   })
 
-  const embed = makeEmbed({ title: 'Commandes disponibles', description: lines.join('\n') })
-  await replyEphemeralEmbed(interaction, embed)
+  const embed = makeEmbed({ title: 'Commandes disponibles', description: lines.join('\n'), type: 'info' })
+  await replyEmbed(interaction, embed)
 }

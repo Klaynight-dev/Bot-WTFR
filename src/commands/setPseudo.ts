@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
 import prisma from '../prisma'
 import { updateGlobalMessage } from '../functions/updateMessage'
-import { makeEmbed, replyEphemeralEmbed } from '../functions/respond' 
+import { makeEmbed, replyEmbed } from '../functions/respond' 
 
 export const data = new SlashCommandBuilder()
   .setName('setpseudo')
@@ -27,13 +27,13 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     })
   } catch (err) {
     console.error('prisma upsert pseudo failed:', err)
-    try { await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: "Erreur lors de l'enregistrement.", color: 0xFF0000 })) } catch (_) {}
+    try { await replyEmbed(interaction, makeEmbed({ title: 'Erreur', description: "Erreur lors de l'enregistrement.", type: 'error' }), false) } catch (_) {}
     return
   }
 
   const embed = makeEmbed({ title: 'Pseudo enregistré', description: `Ton pseudo WTFR a bien été enregistré.`, color: 0x00AA00, fields: [{ name: 'Affichage', value: affichage }, { name: 'Roblox', value: roblox }] })
   try {
-    await replyEphemeralEmbed(interaction, embed)
+    await replyEmbed(interaction, embed, false)
   } catch (err) {
     console.error('interaction reply failed:', err)
   }

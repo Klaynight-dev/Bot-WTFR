@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
 import prisma from '../prisma'
 import { updateGlobalMessage } from '../functions/updateMessage'
-import { makeEmbed, replyEphemeralEmbed } from '../functions/respond'
+import { makeEmbed, replyEmbed } from '../functions/respond'
 
 export const data = new SlashCommandBuilder()
   .setName('editpseudo')
@@ -19,7 +19,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   if (!existing) {
     try {
-      return await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: "Tu n’as pas enregistré de pseudo.", color: 0xFF0000 }))
+      return await replyEmbed(interaction, makeEmbed({ title: 'Erreur', description: "Tu n’as pas enregistré de pseudo.", type: 'error' }), false)
     } catch (err) {
       console.error('interaction reply failed:', err)
       return
@@ -30,7 +30,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   const embed = makeEmbed({ title: 'Pseudos modifiés', description: `Tes pseudos ont été mis à jour.`, color: 0x00AA00, fields: [{ name: 'Affichage', value: affichage }, { name: 'Roblox', value: roblox }] })
   try {
-    await replyEphemeralEmbed(interaction, embed)
+    await replyEmbed(interaction, embed, false)
   } catch (err) {
     console.error('interaction reply failed:', err)
   }

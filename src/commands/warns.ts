@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
 import prisma from '../prisma'
-import { makeEmbed, replyEphemeralEmbed } from '../functions/respond' 
+import { makeEmbed, replyEmbed } from '../functions/respond' 
 
 export const data = new SlashCommandBuilder()
   .setName('warns')
@@ -13,7 +13,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   console.log(`[cmd:warns] /warns by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`)
   const userWarnings = await prisma.warning.findMany({ where: { userId: user.id }, orderBy: { date: 'desc' } })
 
-  if (userWarnings.length === 0) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Avertissements', description: 'Aucun avertissement pour cet utilisateur.', color: 0xFFA500 }))
+  if (userWarnings.length === 0) return replyEmbed(interaction, makeEmbed({ title: 'Avertissements', description: 'Aucun avertissement pour cet utilisateur.', type: 'warn' }))
 
   const embed = makeEmbed({
     title: `Avertissements — ${user.tag}`,
@@ -21,5 +21,5 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     color: 0xFFA500
   })
 
-  await replyEphemeralEmbed(interaction, embed)
+  await replyEmbed(interaction, embed)
 }

@@ -11,11 +11,27 @@ export function getBrandingAttachment(): { path: string; name: string } | null {
   return null
 }
 
-export function makeEmbed(opts: { title?: string; description?: string; color?: number; fields?: { name: string; value: string; inline?: boolean }[]; footer?: string; footerIconUrl?: string }) {
+export function makeEmbed(opts: { title?: string; description?: string; color?: number; fields?: { name: string; value: string; inline?: boolean }[]; footer?: string; footerIconUrl?: string; type?: 'success' | 'error' | 'info' | 'warn' | 'neutral' }) {
   const embed = new EmbedBuilder()
-  if (opts.title) embed.setTitle(opts.title)
+
+  // style presets
+  const type = opts.type ?? 'neutral'
+  const palette: Record<string, { color: number; emoji: string }> = {
+    success: { color: 0x2ECC71, emoji: '✅' },
+    error: { color: 0xE74C3C, emoji: '❌' },
+    info: { color: 0x5865F2, emoji: 'ℹ️' },
+    warn: { color: 0xFFA500, emoji: '⚠️' },
+    neutral: { color: 0x2F3136, emoji: '' }
+  }
+
+  const preset = palette[type]
+
+  if (opts.title) {
+    const title = `${preset.emoji ? `${preset.emoji} ` : ''}${opts.title}`
+    embed.setTitle(title)
+  }
   if (opts.description) embed.setDescription(opts.description)
-  embed.setColor(opts.color ?? 0x5865F2)
+  embed.setColor(opts.color ?? preset.color)
   if (opts.fields) embed.addFields(...opts.fields)
   embed.setTimestamp()
 
@@ -31,6 +47,11 @@ export function makeEmbed(opts: { title?: string; description?: string; color?: 
   embed.setFooter(footerPayload)
 
   return embed
+}
+
+// Generic reply helper: allows choosing between public or ephemeral replies easily
+export async function replyEmbed(interaction: ChatInputCommandInteraction, embed: EmbedBuilder, secret = false) {
+  return sendPublicOrSecret(interaction, embed, secret)
 }
 
 async function _maybeAttachAndReply(interaction: ChatInputCommandInteraction, options: any) {
