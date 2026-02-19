@@ -9,8 +9,13 @@ COPY prisma ./prisma
 COPY prisma.config.ts ./
 COPY src ./src
 
-RUN pnpm install --no-frozen-lockfile
-RUN pnpm prisma:generate
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
+
+RUN if [ -z "$BDD_URL" ]; then \
+			echo "Skipping prisma generate (no BDD_URL provided)"; \
+		else \
+			DATABASE_URL="$BDD_URL" pnpm prisma:generate; \
+		fi
 RUN pnpm run build
 
 FROM node:20-alpine AS runner
