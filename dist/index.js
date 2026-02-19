@@ -23,8 +23,6 @@ if (fs_1.default.existsSync(commandsPath)) {
 }
 client.once('clientReady', () => {
     console.log(`✅ Connecté en tant que ${client.user?.tag}`);
-    (0, updateMessage_1.updateGlobalMessage)(client);
-    setInterval(() => (0, updateMessage_1.updateGlobalMessage)(client), 14 * 24 * 60 * 60 * 1000);
 });
 client.on('interactionCreate', async (interaction) => {
     try {
