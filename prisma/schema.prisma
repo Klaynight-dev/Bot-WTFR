@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("BDD_URL")
+  // connection URL moved to prisma.config.ts (Prisma v7+)
 }
 
 model Pseudo {
