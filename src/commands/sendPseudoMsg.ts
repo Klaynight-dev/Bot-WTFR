@@ -11,7 +11,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   try {
     // deferring so interaction won't expire while updateGlobalMessage runs
     await interaction.deferReply({ flags: MessageFlags.Ephemeral })
-    await updateGlobalMessage(client)
+    await updateGlobalMessage(client, true)
     await interaction.editReply({ content: '✅ Message public envoyé / mis à jour.' })
   } catch (err) {
     console.error(err)

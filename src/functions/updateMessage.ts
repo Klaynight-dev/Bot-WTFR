@@ -32,9 +32,9 @@ export function buildPseudosPage(pseudos: any[] = [], page = 0, perPage = 5) {
   return { embeds: [embed], components: [row], page, totalPages }
 }
 
-export async function updateGlobalMessage(client: Client) {
+export async function updateGlobalMessage(client: Client, createIfMissing = false) {
   try {
-    console.log('[updateGlobalMessage] invoked')
+    console.log('[updateGlobalMessage] invoked (createIfMissing=' + Boolean(createIfMissing) + ')')
     if (!prismaEnabled) {
       console.warn('[updateGlobalMessage] Prisma disabled — skipping DB operations')
       return
@@ -105,7 +105,12 @@ export async function updateGlobalMessage(client: Client) {
       }
     }
 
-    // créer un nouveau message si nécessaire
+    // créer un nouveau message si nécessaire (création contrôlée par createIfMissing)
+    if (!createIfMissing) {
+      console.log('[updateGlobalMessage] message missing and createIfMissing=false — skipping message creation')
+      return
+    }
+
     let targetChannel: any = null
     if (preferredChannelId) {
       try {

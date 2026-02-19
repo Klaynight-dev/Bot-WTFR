@@ -23,7 +23,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   }
 
   try {
-    await updateGlobalMessage(client)
+    await updateGlobalMessage(client, true)
     await interaction.editReply({ content: `✅ Salon de listing défini sur <#${channel.id}>.` })
   } catch (err) {
     console.error(err)
