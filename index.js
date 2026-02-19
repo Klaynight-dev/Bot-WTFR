@@ -1,5 +1,8 @@
 require('dotenv').config()
 
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
+
 const {
   Client,
   GatewayIntentBits,
@@ -55,8 +58,8 @@ client.on('interactionCreate', async interaction => {
 
       // Pagination
       if (id === 'pseudos_prev' || id === 'pseudos_next') {
-        const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]')
-        const msgData = JSON.parse(fs.readFileSync('./messageId.json', 'utf8') || '{}')
+        const pseudos = await prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
+        const msgData = (await prisma.messageState.findFirst()) || {}
         const perPage = 5
         const totalPages = Math.max(1, Math.ceil(pseudos.length / perPage))
         let page = typeof msgData.page === 'number' ? msgData.page : 0
@@ -65,8 +68,11 @@ client.on('interactionCreate', async interaction => {
 
         const payload = buildPseudosPage(pseudos, page, perPage)
 
-        msgData.page = payload.page
-        fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
+        if (msgData?.id) {
+          await prisma.messageState.update({ where: { id: msgData.id }, data: { page: payload.page } })
+        } else {
+          await prisma.messageState.create({ data: { page: payload.page } })
+        }
 
         await interaction.update({ embeds: payload.embeds, components: payload.components })
         return
@@ -75,7 +81,7 @@ client.on('interactionCreate', async interaction => {
       // Goto from search results
       if (id.startsWith('pseudos_goto_')) {
         const targetId = id.replace('pseudos_goto_', '')
-        const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]')
+        const pseudos = await prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
         const idx = pseudos.findIndex(u => u.id === targetId)
         if (idx === -1) {
           await interaction.reply({ content: 'Utilisateur introuvable dans la liste.', flags: 64 })
@@ -87,7 +93,7 @@ client.on('interactionCreate', async interaction => {
         const payload = buildPseudosPage(pseudos, page, perPage)
 
         // edit public message
-        const msgData = JSON.parse(fs.readFileSync('./messageId.json', 'utf8') || '{}')
+        const msgData = (await prisma.messageState.findFirst()) || {}
         if (msgData.channelId && msgData.messageId) {
           try {
             const ch = await client.channels.fetch(msgData.channelId).catch(() => null)
@@ -95,8 +101,7 @@ client.on('interactionCreate', async interaction => {
               const msg = await ch.messages.fetch(msgData.messageId).catch(() => null)
               if (msg) {
                 await msg.edit({ embeds: payload.embeds, components: payload.components })
-                msgData.page = payload.page
-                fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
+                if (msgData?.id) await prisma.messageState.update({ where: { id: msgData.id }, data: { page: payload.page } })
               }
             }
           } catch (err) {
@@ -122,7 +127,7 @@ client.on('interactionCreate', async interaction => {
     if (interaction.isModalSubmit()) {
       if (interaction.customId === 'pseudos_modal_search') {
         const q = interaction.fields.getTextInputValue('query').trim()
-        const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]')
+        const pseudos = await prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
         const matches = []
 
         const mentionMatch = q.match(/^<@!?(\d+)>$/) || q.match(/^(\d+)$/)
