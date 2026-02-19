@@ -18,7 +18,8 @@
   "dependencies": {
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
-    "@prisma/client": "^7.4.1"
+    "@prisma/client": "^7.4.1",
+    "@prisma/adapter-pg": "^7.4.1"
   },
   "devDependencies": {
     "typescript": "^5.5.6",
