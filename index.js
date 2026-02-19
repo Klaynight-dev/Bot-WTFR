@@ -25,7 +25,7 @@ for (const file of commandFiles) {
   client.commands.set(command.data.name, command)
 }
 
-client.once('clientReady', () => {
+client.once('ready', () => {
   console.log(`✅ Connecté en tant que ${client.user.tag}`)
 
   updateGlobalMessage(client)
@@ -53,22 +53,9 @@ client.on('interactionCreate', async interaction => {
     if (interaction.isButton()) {
       const id = interaction.customId
 
-      // Pagination
+      // Pagination buttons removed from public listing — ignore legacy clicks
       if (id === 'pseudos_prev' || id === 'pseudos_next') {
-        const pseudos = JSON.parse(fs.readFileSync('./pseudos.json', 'utf8') || '[]')
-        const msgData = JSON.parse(fs.readFileSync('./messageId.json', 'utf8') || '{}')
-        const perPage = 5
-        const totalPages = Math.max(1, Math.ceil(pseudos.length / perPage))
-        let page = typeof msgData.page === 'number' ? msgData.page : 0
-
-        page = id === 'pseudos_next' ? Math.min(totalPages - 1, page + 1) : Math.max(0, page - 1)
-
-        const payload = buildPseudosPage(pseudos, page, perPage)
-
-        msgData.page = payload.page
-        fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
-
-        await interaction.update({ embeds: payload.embeds, components: payload.components })
+        await interaction.reply({ content: 'Pagination désactivée pour le message public.', flags: 64 })
         return
       }
 
@@ -94,7 +81,7 @@ client.on('interactionCreate', async interaction => {
             if (ch) {
               const msg = await ch.messages.fetch(msgData.messageId).catch(() => null)
               if (msg) {
-                await msg.edit({ embeds: payload.embeds, components: payload.components })
+                await msg.edit({ embeds: payload.embeds })
                 msgData.page = payload.page
                 fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
               }
@@ -108,12 +95,9 @@ client.on('interactionCreate', async interaction => {
         return
       }
 
-      // Open search modal
+      // 'pseudos_search' button removed from public listing — modal is not reachable from that message
       if (id === 'pseudos_search') {
-        const modal = new ModalBuilder().setCustomId('pseudos_modal_search').setTitle('Rechercher un pseudo')
-        const input = new TextInputBuilder().setCustomId('query').setLabel('Discord / affichage / roblox').setStyle(TextInputStyle.Short).setRequired(true)
-        modal.addComponents(new ActionRowBuilder().addComponents(input))
-        await interaction.showModal(modal)
+        await interaction.reply({ content: 'Recherche désactivée depuis le message public.', flags: 64 })
         return
       }
     }

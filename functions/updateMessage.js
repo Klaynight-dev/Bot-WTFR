@@ -1,12 +1,12 @@
 const fs = require('fs')
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
+const { EmbedBuilder } = require('discord.js')
 
 /**
- * Génère un embed paginé et les composants (Prev / Search / Next)
+ * Génère un embed paginé (sans composants) pour le message public
  * @param {Array} pseudos
  * @param {number} page
  * @param {number} perPage
- * @returns {{embeds: Array, components: Array, page: number, totalPages: number}}
+ * @returns {{embeds: Array, page: number, totalPages: number}}
  */
 function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
   const total = Array.isArray(pseudos) ? pseudos.length : 0
@@ -25,13 +25,8 @@ function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
     .setDescription(description)
     .setFooter({ text: `Page ${page + 1}/${totalPages} • ${total} pseudos` })
 
-  const prev = new ButtonBuilder().setCustomId('pseudos_prev').setLabel('⬅️ Précédent').setStyle(ButtonStyle.Primary).setDisabled(page <= 0)
-  const search = new ButtonBuilder().setCustomId('pseudos_search').setLabel('🔎 Rechercher').setStyle(ButtonStyle.Secondary)
-  const next = new ButtonBuilder().setCustomId('pseudos_next').setLabel('Suivant ➡️').setStyle(ButtonStyle.Primary).setDisabled(page >= totalPages - 1)
-
-  const row = new ActionRowBuilder().addComponents(prev, search, next)
-
-  return { embeds: [embed], components: [row], page, totalPages }
+  // Public listing: retourne uniquement l'embed (pas de composants)
+  return { embeds: [embed], page, totalPages }
 }
 
 /**
@@ -58,7 +53,7 @@ async function updateGlobalMessage(client) {
           if (ch && typeof ch.messages?.fetch === 'function') {
             const msg = await ch.messages.fetch(messageId).catch(() => null)
             if (msg) {
-              await msg.edit({ embeds: payload.embeds, components: payload.components })
+              await msg.edit({ embeds: payload.embeds })
               msgData.page = payload.page
               fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
               return
@@ -74,7 +69,7 @@ async function updateGlobalMessage(client) {
         try {
           const msg = await channel.messages.fetch(messageId).catch(() => null)
           if (msg) {
-            await msg.edit({ embeds: payload.embeds, components: payload.components })
+            await msg.edit({ embeds: payload.embeds })
             msgData.channelId = channel.id
             msgData.page = payload.page
             fs.writeFileSync('./messageId.json', JSON.stringify(msgData, null, 2))
@@ -106,7 +101,7 @@ async function updateGlobalMessage(client) {
       if (!targetChannel) return
     }
 
-    const newMsg = await targetChannel.send({ embeds: payload.embeds, components: payload.components })
+    const newMsg = await targetChannel.send({ embeds: payload.embeds })
     msgData.messageId = newMsg.id
     msgData.channelId = targetChannel.id
     msgData.page = payload.page
