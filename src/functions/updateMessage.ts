@@ -88,7 +88,7 @@ export async function updateGlobalMessage(client: Client, createIfMissing = fals
               console.log(`[updateGlobalMessage] editing message ${messageId} in channel ${(ch as any).id}`)
               const branding = getBrandingAttachment()
               const needsAttachment = Boolean(payload.embeds?.[0]?.data?.footer?.icon_url?.startsWith?.('attachment://'))
-              if (branding && needsAttachment && !(msg.attachments && Array.from(msg.attachments.values()).some(a => a.name === branding.name))) {
+                if (branding && needsAttachment && !(msg.attachments && Array.from(msg.attachments.values()).some((a: any) => a.name === branding.name))) {
                 await msg.edit({ embeds: payload.embeds, components: payload.components, files: [{ attachment: branding.path, name: branding.name }] })
               } else {
                 await msg.edit({ embeds: payload.embeds, components: payload.components })
@@ -114,7 +114,7 @@ export async function updateGlobalMessage(client: Client, createIfMissing = fals
             console.log(`[updateGlobalMessage] found message ${messageId} in channel ${(channel as any).id} — editing`)
             const branding = getBrandingAttachment()
             const needsAttachment = Boolean(payload.embeds?.[0]?.data?.footer?.icon_url?.startsWith?.('attachment://'))
-            if (branding && needsAttachment && !(msg.attachments && Array.from(msg.attachments.values()).some(a => a.name === branding.name))) {
+              if (branding && needsAttachment && !(msg.attachments && Array.from(msg.attachments.values()).some((a: any) => a.name === branding.name))) {
               await msg.edit({ embeds: payload.embeds, components: payload.components, files: [{ attachment: branding.path, name: branding.name }] })
             } else {
               await msg.edit({ embeds: payload.embeds, components: payload.components })
