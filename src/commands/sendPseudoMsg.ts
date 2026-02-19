@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
 import { updateGlobalMessage } from '../functions/updateMessage'
 
 export const data = new SlashCommandBuilder()
@@ -10,7 +10,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   console.log(`[cmd:send-pseudo-msg] /send-pseudo-msg by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'}`)
   try {
     // deferring so interaction won't expire while updateGlobalMessage runs
-    await interaction.deferReply({ ephemeral: true })
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral })
     await updateGlobalMessage(client)
     await interaction.editReply({ content: '✅ Message public envoyé / mis à jour.' })
   } catch (err) {

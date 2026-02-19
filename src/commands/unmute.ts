@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
 
 export const data = new SlashCommandBuilder()
   .setName('unmute')
@@ -10,16 +10,16 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const user = interaction.options.getUser('utilisateur', true)
   console.log(`[cmd:unmute] /unmute by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`)
 
-  if (!interaction.guild) return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', ephemeral: true })
+  if (!interaction.guild) return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', flags: MessageFlags.Ephemeral })
 
   const member = await interaction.guild.members.fetch(user.id).catch(() => null)
-  if (!member) return interaction.reply({ content: 'Membre introuvable.', ephemeral: true })
+  if (!member) return interaction.reply({ content: 'Membre introuvable.', flags: MessageFlags.Ephemeral })
 
   try {
     await (member as any).timeout(null)
-    await interaction.reply({ content: `✅ Timeout retiré pour ${user.tag}.`, ephemeral: true })
+    await interaction.reply({ content: `✅ Timeout retiré pour ${user.tag}.`, flags: MessageFlags.Ephemeral })
   } catch (err) {
     console.error(err)
-    await interaction.reply({ content: '❌ Impossible de retirer le timeout.', ephemeral: true })
+    await interaction.reply({ content: '❌ Impossible de retirer le timeout.', flags: MessageFlags.Ephemeral })
   }
 }

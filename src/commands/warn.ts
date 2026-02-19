@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
 import prisma from '../prisma'
 
 export const data = new SlashCommandBuilder()
@@ -14,5 +14,5 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   console.log(`[cmd:warn] /warn by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} reason=${reason}`)
   await prisma.warning.create({ data: { userId: user.id, moderatorId: interaction.user.id, reason } })
 
-  await interaction.reply({ content: `⚠️ ${user.tag} averti.`, ephemeral: true })
+  await interaction.reply({ content: `⚠️ ${user.tag} averti.`, flags: MessageFlags.Ephemeral })
 }

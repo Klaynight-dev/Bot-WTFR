@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
 
 export const data = new SlashCommandBuilder()
   .setName('tempban')
@@ -14,11 +14,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const reason = interaction.options.getString('raison') || 'Aucune raison fournie'
   console.log(`[cmd:tempban] /tempban by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} minutes=${minutes} reason=${reason}`)
 
-  if (!interaction.guild) return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', ephemeral: true })
+  if (!interaction.guild) return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', flags: MessageFlags.Ephemeral })
 
   try {
     await (interaction.guild.members as any).ban(user.id, { reason })
-    await interaction.reply({ content: `✅ ${user.tag} banni pour ${minutes} minute(s). (attention : ne survive pas au redémarrage du bot)`, ephemeral: true })
+    await interaction.reply({ content: `✅ ${user.tag} banni pour ${minutes} minute(s). (attention : ne survive pas au redémarrage du bot)`, flags: MessageFlags.Ephemeral })
 
     const ms = minutes * 60 * 1000
     setTimeout(async () => {
@@ -31,6 +31,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     }, ms)
   } catch (err) {
     console.error(err)
-    await interaction.reply({ content: '❌ Impossible de bannir ce membre.', ephemeral: true })
+    await interaction.reply({ content: '❌ Impossible de bannir ce membre.', flags: MessageFlags.Ephemeral })
   }
 }

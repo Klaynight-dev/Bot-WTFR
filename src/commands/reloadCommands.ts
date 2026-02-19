@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, Client } from 'discord.js'
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, Client, MessageFlags } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
 
@@ -36,5 +36,5 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     }
   }
 
-  await interaction.reply({ content: `✅ ${client.commands.size} commandes rechargées.`, ephemeral: true })
+  await interaction.reply({ content: `✅ ${client.commands.size} commandes rechargées.`, flags: MessageFlags.Ephemeral })
 }
