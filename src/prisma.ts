@@ -16,7 +16,8 @@ if (connectionString) {
   const missingMsg = 'Environment variable BDD_URL is not set — Prisma is disabled.'
   // A proxy that returns async functions which reject with a helpful error when called.
   const handler: ProxyHandler<any> = {
-    get: () => {
+    get: (target, prop) => {
+      if (prop in target) return (target as any)[prop]
       return new Proxy(() => Promise.reject(new Error(missingMsg)), {
         apply: () => Promise.reject(new Error(missingMsg)),
         get: () => handler.get,
@@ -31,5 +32,7 @@ if (connectionString) {
 
   prisma = noopPrisma
 }
+
+export const prismaEnabled = Boolean(connectionString)
 
 export default prisma as PrismaClient

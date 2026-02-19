@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.prismaEnabled = void 0;
 require("dotenv/config");
 const client_1 = require("@prisma/client");
 const adapter_pg_1 = require("@prisma/adapter-pg");
@@ -15,8 +16,12 @@ if (connectionString) {
 else {
     const missingMsg = 'Environment variable BDD_URL is not set — Prisma is disabled.';
     // A proxy that returns async functions which reject with a helpful error when called.
+    // Allow explicitly-set properties on the proxy target (for example $connect/$disconnect)
+    // to be returned so lifecycle methods can be no-ops.
     const handler = {
-        get: () => {
+        get: (target, prop) => {
+            if (prop in target)
+                return target[prop];
             return new Proxy(() => Promise.reject(new Error(missingMsg)), {
                 apply: () => Promise.reject(new Error(missingMsg)),
                 get: () => handler.get,
@@ -29,4 +34,5 @@ else {
     noopPrisma.$disconnect = async () => undefined;
     prisma = noopPrisma;
 }
+exports.prismaEnabled = Boolean(connectionString);
 exports.default = prisma;

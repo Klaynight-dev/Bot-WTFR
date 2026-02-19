@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import fs from 'fs'
 import path from 'path'
-import prisma from './prisma'
+import prisma, { prismaEnabled } from './prisma'
 import {
   Client,
   GatewayIntentBits,
@@ -34,17 +34,25 @@ if (fs.existsSync(commandsPath)) {
 client.once('clientReady', async () => {
   console.log(`✅ Connecté en tant que ${client.user?.tag}`)
 
-  try {
-    await prisma.$connect()
-    console.log('[prisma] connected to DB')
-  } catch (err) {
-    console.error('[prisma] connection error:', err)
+  if (prismaEnabled) {
+    try {
+      await prisma.$connect()
+      console.log('[prisma] connected to DB')
+    } catch (err) {
+      console.error('[prisma] connection error:', err)
+    }
+  } else {
+    console.warn('[prisma] BDD_URL not set — Prisma disabled. DB operations will be skipped.')
   }
 
-  try {
-    await updateGlobalMessage(client)
-  } catch (err) {
-    console.error('updateGlobalMessage (startup) failed:', err)
+  if (prismaEnabled) {
+    try {
+      await updateGlobalMessage(client)
+    } catch (err) {
+      console.error('updateGlobalMessage (startup) failed:', err)
+    }
+  } else {
+    console.warn('[startup] skipping updateGlobalMessage because Prisma is disabled')
   }
 
 })

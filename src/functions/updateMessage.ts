@@ -1,7 +1,8 @@
 import { EmbedBuilder, Client, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
-import prisma from '../prisma'
+import prisma, { prismaEnabled } from '../prisma'
 
 export async function getPseudos(): Promise<any[]> {
+  if (!prismaEnabled) return []
   return prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
 }
 
@@ -34,6 +35,10 @@ export function buildPseudosPage(pseudos: any[] = [], page = 0, perPage = 5) {
 export async function updateGlobalMessage(client: Client) {
   try {
     console.log('[updateGlobalMessage] invoked')
+    if (!prismaEnabled) {
+      console.warn('[updateGlobalMessage] Prisma disabled — skipping DB operations')
+      return
+    }
     console.log('[updateGlobalMessage] fetching pseudos from DB (timeout 5s)...')
     const pseudos = await Promise.race([
       getPseudos(),

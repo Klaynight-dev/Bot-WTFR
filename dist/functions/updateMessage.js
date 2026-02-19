@@ -1,14 +1,46 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPseudos = getPseudos;
 exports.buildPseudosPage = buildPseudosPage;
 exports.updateGlobalMessage = updateGlobalMessage;
 const discord_js_1 = require("discord.js");
-const prisma_1 = __importDefault(require("../prisma"));
+const prisma_1 = __importStar(require("../prisma"));
 async function getPseudos() {
+    if (!prisma_1.prismaEnabled)
+        return [];
     return prisma_1.default.pseudo.findMany({ orderBy: { createdAt: 'asc' } });
 }
 function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
@@ -34,6 +66,10 @@ function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
 async function updateGlobalMessage(client) {
     try {
         console.log('[updateGlobalMessage] invoked');
+        if (!prisma_1.prismaEnabled) {
+            console.warn('[updateGlobalMessage] Prisma disabled — skipping DB operations');
+            return;
+        }
         console.log('[updateGlobalMessage] fetching pseudos from DB (timeout 5s)...');
         const pseudos = await Promise.race([
             getPseudos(),
