@@ -20,8 +20,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY package.json pnpm-lock.yaml ./
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+COPY --from=builder /app/node_modules ./node_modules
 
 COPY --from=builder /app/dist ./dist
 
