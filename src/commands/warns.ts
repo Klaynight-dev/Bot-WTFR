@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits, MessageFlags } from 'discord.js'
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
 import prisma from '../prisma'
 import { makeEmbed, replyEphemeralEmbed } from '../functions/respond' 
 
@@ -15,10 +15,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   if (userWarnings.length === 0) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Avertissements', description: 'Aucun avertissement pour cet utilisateur.', color: 0xFFA500 }))
 
-  const embed = new EmbedBuilder()
-    .setTitle(`Avertissements — ${user.tag}`)
-    .setDescription(userWarnings.map((w: any, i: number) => `**${i + 1}.** ${w.reason} — <@${w.moderatorId}> (${new Date(w.date).toLocaleString()})`).join('\n'))
-    .setColor(0xFFA500)
+  const embed = makeEmbed({
+    title: `Avertissements — ${user.tag}`,
+    description: userWarnings.map((w: any, i: number) => `**${i + 1}.** ${w.reason} — <@${w.moderatorId}> (${new Date(w.date).toLocaleString()})`).join('\n'),
+    color: 0xFFA500
+  })
 
   await replyEphemeralEmbed(interaction, embed)
 }

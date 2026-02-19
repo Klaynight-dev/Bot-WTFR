@@ -17,17 +17,18 @@
     "prisma:dbpush": "prisma db push"
   },
   "dependencies": {
-    "discord.js": "^14.14.1",
-    "dotenv": "^16.4.5",
+    "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",
-    "@prisma/adapter-pg": "^7.4.1"
+    "discord.js": "^13.17.1",
+    "dotenv": "^16.4.5",
+    "pnpm": "^10.30.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.6",
+    "@types/node": "^20.4.2",
+    "prisma": "^6.19.2",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
-    "@types/node": "^20.4.2",
-    "prisma": "^7.4.1"
+    "typescript": "^5.5.6"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

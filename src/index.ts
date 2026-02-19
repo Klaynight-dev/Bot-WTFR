@@ -16,6 +16,7 @@ import {
 } from 'discord.js'
 
 import { updateGlobalMessage, buildPseudosPage } from './functions/updateMessage'
+import { makeEmbed, getBrandingAttachment } from './functions/respond' 
 
 type ExtendedClient = Client & { commands: Collection<string, any> }
 const client = new Client({ intents: [GatewayIntentBits.Guilds] }) as ExtendedClient
@@ -92,7 +93,7 @@ client.on('interactionCreate', async (interaction: any) => {
 
         page = id === 'pseudos_next' ? Math.min(totalPages - 1, page + 1) : Math.max(0, page - 1)
 
-        const payload = buildPseudosPage(pseudos, page, perPage)
+        const payload = buildPseudosPage(pseudos, page, perPage, 'attachment://logo.png')
 
         if (msgRow) {
           await prisma.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } })
@@ -100,7 +101,8 @@ client.on('interactionCreate', async (interaction: any) => {
           await prisma.messageState.create({ data: { page: payload.page } })
         }
 
-        await interaction.update({ embeds: payload.embeds, components: payload.components })
+        const branding = getBrandingAttachment()
+        await interaction.update(branding ? { embeds: payload.embeds, components: payload.components, files: [{ attachment: branding.path, name: branding.name }] } : { embeds: payload.embeds, components: payload.components })
         return
       }
 
@@ -116,7 +118,7 @@ client.on('interactionCreate', async (interaction: any) => {
 
         const perPage = 5
         const page = Math.floor(idx / perPage)
-        const payload = buildPseudosPage(pseudos, page, perPage)
+        const payload = buildPseudosPage(pseudos, page, perPage, client.user?.displayAvatarURL?.() ?? undefined)
 
         // edit public embed
         const msgRow = await prisma.messageState.findFirst()
@@ -126,7 +128,13 @@ client.on('interactionCreate', async (interaction: any) => {
             if (ch) {
               const msg = await (ch as any).messages.fetch(msgRow.messageId).catch(() => null)
               if (msg) {
-                await msg.edit({ embeds: payload.embeds, components: payload.components })
+                const branding = getBrandingAttachment()
+                const needsAttachment = Boolean(payload.embeds?.[0]?.data?.footer?.icon_url?.startsWith?.('attachment://'))
+                if (branding && needsAttachment && !(msg.attachments && Array.from(msg.attachments.values()).some(a => a.name === branding.name))) {
+                  await msg.edit({ embeds: payload.embeds, components: payload.components, files: [{ attachment: branding.path, name: branding.name }] })
+                } else {
+                  await msg.edit({ embeds: payload.embeds, components: payload.components })
+                }
                 await prisma.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } })
               }
             }
@@ -171,11 +179,13 @@ client.on('interactionCreate', async (interaction: any) => {
           return
         }
 
-        const embed = new EmbedBuilder()
-          .setTitle(`Résultats pour "${q}"`)
-          .setColor(0x5865F2)
-          .setDescription(matches.map(u => `• <@${u.id}> — \`${u.display}\` • Roblox: [${u.roblox}](https://www.roblox.com/users/profile?username=${encodeURIComponent(u.roblox)})`).join('\n'))
-          .setFooter({ text: `${matches.length} résultat(s)` })
+        const embed = makeEmbed({
+          title: `Résultats pour "${q}"`,
+          description: matches.map(u => `• <@${u.id}> — \`${u.display}\` • Roblox: [${u.roblox}](https://www.roblox.com/users/profile?username=${encodeURIComponent(u.roblox)})`).join('\n'),
+          color: 0x5865F2,
+          footer: `${matches.length} résultat(s)`,
+          footerIconUrl: client.user?.displayAvatarURL?.() ?? undefined
+        })
 
         const gotoRow = new ActionRowBuilder()
         const linkRow = new ActionRowBuilder()
@@ -188,7 +198,12 @@ client.on('interactionCreate', async (interaction: any) => {
         if ((gotoRow as any).components.length) components.push(gotoRow)
         if ((linkRow as any).components.length) components.push(linkRow)
 
-        await interaction.reply({ embeds: [embed], components, ephemeral: true })
+        const branding = getBrandingAttachment()
+        if (branding) {
+          await interaction.reply({ embeds: [embed], components, ephemeral: true, files: [{ attachment: branding.path, name: branding.name }] })
+        } else {
+          await interaction.reply({ embeds: [embed], components, ephemeral: true })
+        }
         return
       }
     }

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, ChannelType, MessageFlags } from 'discord.js'
 import prisma from '../prisma'
 import { updateGlobalMessage } from '../functions/updateMessage'
-import { makeEmbed } from '../functions/respond' 
+import { makeEmbed, replyEphemeralEmbed } from '../functions/respond' 
 
 export const data = new SlashCommandBuilder()
   .setName('setchannel')
@@ -25,9 +25,9 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   try {
     await updateGlobalMessage(client, true)
-    await interaction.editReply({ embeds: [makeEmbed({ title: 'Salon défini', description: `Salon de listing défini sur <#${channel.id}>.`, color: 0x00AA00 })] })
+    await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Salon défini', description: `Salon de listing défini sur <#${channel.id}>.`, color: 0x00AA00 }))
   } catch (err) {
     console.error(err)
-    try { await interaction.editReply({ embeds: [makeEmbed({ title: 'Erreur', description: "Erreur lors de la mise à jour du message public.", color: 0xFF0000 })] }) } catch (_) {}
+    try { await replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: "Erreur lors de la mise à jour du message public.", color: 0xFF0000 })) } catch (_) {}
   }
 }
