@@ -6,27 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPseudos = getPseudos;
 exports.buildPseudosPage = buildPseudosPage;
 exports.updateGlobalMessage = updateGlobalMessage;
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
 const discord_js_1 = require("discord.js");
 const prisma_1 = __importDefault(require("../prisma"));
-const PSEUDOS_FILE = path_1.default.join(process.cwd(), 'pseudos.json');
-const MESSAGE_STATE_FILE = path_1.default.join(process.cwd(), 'messageId.json');
 async function getPseudos() {
-    try {
-        return await prisma_1.default.pseudo.findMany({ orderBy: { createdAt: 'asc' } });
-    }
-    catch (err) {
-        try {
-            if (fs_1.default.existsSync(PSEUDOS_FILE)) {
-                return JSON.parse(fs_1.default.readFileSync(PSEUDOS_FILE, 'utf8') || '[]');
-            }
-        }
-        catch (_) {
-            // ignore
-        }
-        return [];
-    }
+    return prisma_1.default.pseudo.findMany({ orderBy: { createdAt: 'asc' } });
 }
 function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
     const total = Array.isArray(pseudos) ? pseudos.length : 0;
@@ -48,39 +31,10 @@ function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
     const row = new discord_js_1.ActionRowBuilder().addComponents(prev, search, next);
     return { embeds: [embed], components: [row], page, totalPages };
 }
-async function readLocalMessageState() {
-    try {
-        if (fs_1.default.existsSync(MESSAGE_STATE_FILE)) {
-            return JSON.parse(fs_1.default.readFileSync(MESSAGE_STATE_FILE, 'utf8') || '{}');
-        }
-    }
-    catch (_) {
-        // ignore
-    }
-    return {};
-}
-async function writeLocalMessageState(obj) {
-    try {
-        fs_1.default.writeFileSync(MESSAGE_STATE_FILE, JSON.stringify(obj, null, 2));
-    }
-    catch (_) {
-        // ignore
-    }
-}
 async function updateGlobalMessage(client) {
     try {
-        let pseudos = [];
-        let msgRow = null;
-        let useDb = true;
-        try {
-            pseudos = await prisma_1.default.pseudo.findMany({ orderBy: { createdAt: 'asc' } });
-            msgRow = await prisma_1.default.messageState.findFirst();
-        }
-        catch (err) {
-            useDb = false;
-            pseudos = await getPseudos();
-            msgRow = await readLocalMessageState();
-        }
+        const pseudos = await getPseudos();
+        const msgRow = await prisma_1.default.messageState.findFirst();
         const messageId = msgRow?.messageId;
         const storedChannelId = msgRow?.channelId;
         const preferredChannelId = process.env.CHANNEL_ID || storedChannelId;
@@ -95,10 +49,12 @@ async function updateGlobalMessage(client) {
                         const msg = await ch.messages.fetch(messageId).catch(() => null);
                         if (msg) {
                             await msg.edit({ embeds: payload.embeds, components: payload.components });
-                            if (useDb && msgRow?.id)
+                            if (msgRow?.id) {
                                 await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { page: payload.page } });
-                            else
-                                await writeLocalMessageState({ ...(msgRow || {}), page: payload.page });
+                            }
+                            else {
+                                await prisma_1.default.messageState.create({ data: { messageId: msg.id, channelId: ch.id, page: payload.page } });
+                            }
                             return;
                         }
                     }
@@ -114,11 +70,11 @@ async function updateGlobalMessage(client) {
                     const msg = await channel.messages.fetch(messageId).catch(() => null);
                     if (msg) {
                         await msg.edit({ embeds: payload.embeds, components: payload.components });
-                        if (useDb && msgRow?.id) {
+                        if (msgRow?.id) {
                             await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { channelId: channel.id, page: payload.page } });
                         }
                         else {
-                            await writeLocalMessageState({ messageId: msg.id, channelId: channel.id, page: payload.page });
+                            await prisma_1.default.messageState.create({ data: { messageId: msg.id, channelId: channel.id, page: payload.page } });
                         }
                         return;
                     }
@@ -150,16 +106,11 @@ async function updateGlobalMessage(client) {
                 return;
         }
         const newMsg = await targetChannel.send({ embeds: payload.embeds, components: payload.components });
-        if (useDb) {
-            if (msgRow?.id) {
-                await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { messageId: newMsg.id, channelId: targetChannel.id, page: payload.page } });
-            }
-            else {
-                await prisma_1.default.messageState.create({ data: { messageId: newMsg.id, channelId: targetChannel.id, page: payload.page } });
-            }
+        if (msgRow?.id) {
+            await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { messageId: newMsg.id, channelId: targetChannel.id, page: payload.page } });
         }
         else {
-            await writeLocalMessageState({ messageId: newMsg.id, channelId: targetChannel.id, page: payload.page });
+            await prisma_1.default.messageState.create({ data: { messageId: newMsg.id, channelId: targetChannel.id, page: payload.page } });
         }
     }
     catch (err) {

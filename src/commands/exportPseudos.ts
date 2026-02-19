@@ -1,6 +1,4 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
-import path from 'path'
-import fs from 'fs'
 import prisma from '../prisma'
 
 export const data = new SlashCommandBuilder()
@@ -10,7 +8,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const pseudos = await prisma.pseudo.findMany({ orderBy: { createdAt: 'asc' } })
-  const filePath = path.join(process.cwd(), 'pseudos.json')
-  fs.writeFileSync(filePath, JSON.stringify(pseudos, null, 2))
-  await interaction.reply({ files: [{ attachment: filePath, name: 'pseudos.json' }], ephemeral: true })
+  const json = JSON.stringify(pseudos, null, 2)
+  const buffer = Buffer.from(json, 'utf8')
+  await interaction.reply({ files: [{ attachment: buffer, name: 'pseudos.json' }], ephemeral: true })
 }
