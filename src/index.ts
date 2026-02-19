@@ -26,15 +26,14 @@ const commandsPath = path.join(__dirname, 'commands')
 if (fs.existsSync(commandsPath)) {
   const commandFiles = fs.readdirSync(commandsPath).filter(f => f.endsWith('.js') || f.endsWith('.ts'))
   for (const file of commandFiles) {
-    // dynamic require works with compiled (dist) JS and with ts-node
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const command = require(path.join(commandsPath, file))
     client.commands.set(command.data.name, command)
   }
 }
 
-client.once('clientReady', () => {
+client.once('clientReady', async () => {
   console.log(`✅ Connecté en tant que ${client.user?.tag}`)
+  await updateGlobalMessage(client)
 
 })
 

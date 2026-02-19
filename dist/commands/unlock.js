@@ -12,14 +12,14 @@ async function execute(interaction) {
     const channel = (interaction.options.getChannel('channel') || interaction.channel);
     console.log(`[cmd:unlock] /unlock by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} targetChannel=${channel?.id || 'N/A'}`);
     if (!channel || !channel.permissionOverwrites)
-        return interaction.reply({ content: 'Salon invalide.', ephemeral: true });
+        return interaction.reply({ content: 'Salon invalide.', flags: discord_js_1.MessageFlags.Ephemeral });
     try {
         // retirer l'override (mettre à null)
         await channel.permissionOverwrites.edit(interaction.guild.roles.everyone, { SendMessages: null });
-        await interaction.reply({ content: `🔓 Salon déverrouillé : ${channel.name}`, ephemeral: true });
+        await interaction.reply({ content: `🔓 Salon déverrouillé : ${channel.name}`, flags: discord_js_1.MessageFlags.Ephemeral });
     }
     catch (err) {
         console.error(err);
-        await interaction.reply({ content: '❌ Impossible de déverrouiller le salon.', ephemeral: true });
+        await interaction.reply({ content: '❌ Impossible de déverrouiller le salon.', flags: discord_js_1.MessageFlags.Ephemeral });
     }
 }

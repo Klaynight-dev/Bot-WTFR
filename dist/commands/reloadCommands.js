@@ -41,5 +41,5 @@ async function execute(interaction, client) {
             console.error('failed loading command', fp, err);
         }
     }
-    await interaction.reply({ content: `✅ ${client.commands.size} commandes rechargées.`, ephemeral: true });
+    await interaction.reply({ content: `✅ ${client.commands.size} commandes rechargées.`, flags: discord_js_1.MessageFlags.Ephemeral });
 }

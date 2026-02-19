@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, Client, MessageFlags } from 'discord.js'
+import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
 import prisma from '../prisma'
 import { updateGlobalMessage } from '../functions/updateMessage'
 
@@ -26,11 +26,11 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     })
   } catch (err) {
     console.error('prisma upsert pseudo failed:', err)
-    try { await interaction.reply({ content: "❌ Erreur lors de l'enregistrement.", flags: MessageFlags.Ephemeral }) } catch (_) {}
+    try { await interaction.reply({ content: "❌ Erreur lors de l'enregistrement.", ephemeral: true }) } catch (_) {}
     return
   }
 
-  const replyOptions = { content: '✅ Pseudo enregistré !', flags: MessageFlags.Ephemeral }
+  const replyOptions = { content: '✅ Pseudo enregistré !', ephemeral: true }
   try {
     if (!interaction.deferred && !interaction.replied) {
       await interaction.reply(replyOptions)

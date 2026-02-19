@@ -16,27 +16,27 @@ async function execute(interaction) {
     const reason = interaction.options.getString('raison') || 'Aucune raison fournie';
     console.log(`[cmd:mute] /mute by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} minutes=${minutes} reason=${reason}`);
     if (!interaction.guild)
-        return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', ephemeral: true });
+        return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', flags: discord_js_1.MessageFlags.Ephemeral });
     const member = await interaction.guild.members.fetch(user.id).catch(() => null);
     if (!member)
-        return interaction.reply({ content: 'Membre introuvable.', ephemeral: true });
+        return interaction.reply({ content: 'Membre introuvable.', flags: discord_js_1.MessageFlags.Ephemeral });
     // validation durée (Discord limite : 1 minute -> 28 jours)
     const maxMinutes = 28 * 24 * 60;
     if (minutes <= 0 || minutes > maxMinutes) {
-        return interaction.reply({ content: `Durée invalide — entre 1 et ${maxMinutes} minutes (28 jours).`, ephemeral: true });
+        return interaction.reply({ content: `Durée invalide — entre 1 et ${maxMinutes} minutes (28 jours).`, flags: discord_js_1.MessageFlags.Ephemeral });
     }
     // verification permissions et hiérarchie
     const botMember = interaction.guild.members.me;
     if (!botMember || !botMember.permissions.has?.('ModerateMembers')) {
-        return interaction.reply({ content: "Le bot n'a pas la permission \"MODERATE_MEMBERS\".", ephemeral: true });
+        return interaction.reply({ content: "Le bot n'a pas la permission \"MODERATE_MEMBERS\".", flags: discord_js_1.MessageFlags.Ephemeral });
     }
     // cannot moderate guild owner
     if (member.id === interaction.guild.ownerId) {
-        return interaction.reply({ content: "Impossible de mute le propriétaire du serveur.", ephemeral: true });
+        return interaction.reply({ content: "Impossible de mute le propriétaire du serveur.", flags: discord_js_1.MessageFlags.Ephemeral });
     }
     // role hierarchy: bot must be higher than target
     if ((botMember.roles?.highest?.position ?? 0) <= (member.roles?.highest?.position ?? 0)) {
-        return interaction.reply({ content: "Impossible : le rôle du membre est égal ou supérieur à celui du bot.", ephemeral: true });
+        return interaction.reply({ content: "Impossible : le rôle du membre est égal ou supérieur à celui du bot.", flags: discord_js_1.MessageFlags.Ephemeral });
     }
     // moderator (invoker) must be higher than target unless invoker is guild owner
     const invoker = interaction.member;
@@ -44,7 +44,7 @@ async function execute(interaction) {
         const invokerPos = invoker?.roles?.highest?.position ?? 0;
         const targetPos = member.roles?.highest?.position ?? 0;
         if ((interaction.guild.ownerId !== (interaction.user.id)) && invokerPos <= targetPos) {
-            return interaction.reply({ content: "Tu ne peux pas mute un membre avec un rôle égal ou supérieur au tien.", ephemeral: true });
+            return interaction.reply({ content: "Tu ne peux pas mute un membre avec un rôle égal ou supérieur au tien.", flags: discord_js_1.MessageFlags.Ephemeral });
         }
     }
     catch (_) {
@@ -52,11 +52,11 @@ async function execute(interaction) {
     }
     try {
         await member.timeout(minutes * 60 * 1000, reason);
-        await interaction.reply({ content: `✅ ${user.tag} mis en timeout (${minutes} min).`, ephemeral: true });
+        await interaction.reply({ content: `✅ ${user.tag} mis en timeout (${minutes} min).`, flags: discord_js_1.MessageFlags.Ephemeral });
     }
     catch (err) {
         console.error('mute error:', err);
         const apiMsg = err?.message || String(err);
-        await interaction.reply({ content: `❌ Impossible de placer en timeout. Erreur API: ${apiMsg}`, ephemeral: true });
+        await interaction.reply({ content: `❌ Impossible de placer en timeout. Erreur API: ${apiMsg}`, flags: discord_js_1.MessageFlags.Ephemeral });
     }
 }

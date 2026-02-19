@@ -12,13 +12,13 @@ async function execute(interaction) {
     const channel = (interaction.options.getChannel('channel') || interaction.channel);
     console.log(`[cmd:lock] /lock by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} targetChannel=${channel?.id || 'N/A'}`);
     if (!channel || !channel.permissionOverwrites)
-        return interaction.reply({ content: 'Salon invalide.', ephemeral: true });
+        return interaction.reply({ content: 'Salon invalide.', flags: discord_js_1.MessageFlags.Ephemeral });
     try {
         await channel.permissionOverwrites.edit(interaction.guild.roles.everyone, { SendMessages: false });
-        await interaction.reply({ content: `🔒 Salon verrouillé : ${channel.name}`, ephemeral: true });
+        await interaction.reply({ content: `🔒 Salon verrouillé : ${channel.name}`, flags: discord_js_1.MessageFlags.Ephemeral });
     }
     catch (err) {
         console.error(err);
-        await interaction.reply({ content: '❌ Impossible de verrouiller le salon.', ephemeral: true });
+        await interaction.reply({ content: '❌ Impossible de verrouiller le salon.', flags: discord_js_1.MessageFlags.Ephemeral });
     }
 }

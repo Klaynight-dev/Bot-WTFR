@@ -33,13 +33,18 @@ function buildPseudosPage(pseudos = [], page = 0, perPage = 5) {
 }
 async function updateGlobalMessage(client) {
     try {
+        console.log('[updateGlobalMessage] invoked');
+        console.log('[updateGlobalMessage] fetching pseudos from DB...');
         const pseudos = await getPseudos();
+        console.log(`[updateGlobalMessage] fetched pseudos=${pseudos.length}`);
+        console.log('[updateGlobalMessage] fetching messageState from DB...');
         const msgRow = await prisma_1.default.messageState.findFirst();
+        console.log(`[updateGlobalMessage] messageState=${JSON.stringify(msgRow)}`);
         const messageId = msgRow?.messageId;
         const storedChannelId = msgRow?.channelId;
         const preferredChannelId = process.env.CHANNEL_ID || storedChannelId;
         const currentPage = typeof msgRow?.page === 'number' ? msgRow.page : 0;
-        console.log(`[updateGlobalMessage] start — pseudos=${pseudos.length} page=${currentPage} preferredChannel=${preferredChannelId} messageId=${messageId}`);
+        console.log(`[updateGlobalMessage] start — page=${currentPage} preferredChannel=${preferredChannelId} messageId=${messageId}`);
         const payload = buildPseudosPage(pseudos, currentPage);
         // try éditer le message existant (préférer channel sauvegardé)
         if (messageId) {

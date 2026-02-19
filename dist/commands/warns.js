@@ -17,10 +17,10 @@ async function execute(interaction) {
     console.log(`[cmd:warns] /warns by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`);
     const userWarnings = await prisma_1.default.warning.findMany({ where: { userId: user.id }, orderBy: { date: 'desc' } });
     if (userWarnings.length === 0)
-        return interaction.reply({ content: 'Aucun avertissement pour cet utilisateur.', ephemeral: true });
+        return interaction.reply({ content: 'Aucun avertissement pour cet utilisateur.', flags: discord_js_1.MessageFlags.Ephemeral });
     const embed = new discord_js_1.EmbedBuilder()
         .setTitle(`Avertissements — ${user.tag}`)
         .setDescription(userWarnings.map((w, i) => `**${i + 1}.** ${w.reason} — <@${w.moderatorId}> (${new Date(w.date).toLocaleString()})`).join('\n'))
         .setColor(0xFFA500);
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await interaction.reply({ embeds: [embed], flags: discord_js_1.MessageFlags.Ephemeral });
 }

@@ -12,16 +12,16 @@ async function execute(interaction) {
     const user = interaction.options.getUser('utilisateur', true);
     console.log(`[cmd:unmute] /unmute by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`);
     if (!interaction.guild)
-        return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', ephemeral: true });
+        return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', flags: discord_js_1.MessageFlags.Ephemeral });
     const member = await interaction.guild.members.fetch(user.id).catch(() => null);
     if (!member)
-        return interaction.reply({ content: 'Membre introuvable.', ephemeral: true });
+        return interaction.reply({ content: 'Membre introuvable.', flags: discord_js_1.MessageFlags.Ephemeral });
     try {
         await member.timeout(null);
-        await interaction.reply({ content: `✅ Timeout retiré pour ${user.tag}.`, ephemeral: true });
+        await interaction.reply({ content: `✅ Timeout retiré pour ${user.tag}.`, flags: discord_js_1.MessageFlags.Ephemeral });
     }
     catch (err) {
         console.error(err);
-        await interaction.reply({ content: '❌ Impossible de retirer le timeout.', ephemeral: true });
+        await interaction.reply({ content: '❌ Impossible de retirer le timeout.', flags: discord_js_1.MessageFlags.Ephemeral });
     }
 }

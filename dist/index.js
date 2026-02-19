@@ -15,14 +15,13 @@ const commandsPath = path_1.default.join(__dirname, 'commands');
 if (fs_1.default.existsSync(commandsPath)) {
     const commandFiles = fs_1.default.readdirSync(commandsPath).filter(f => f.endsWith('.js') || f.endsWith('.ts'));
     for (const file of commandFiles) {
-        // dynamic require works with compiled (dist) JS and with ts-node
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const command = require(path_1.default.join(commandsPath, file));
         client.commands.set(command.data.name, command);
     }
 }
-client.once('clientReady', () => {
+client.once('clientReady', async () => {
     console.log(`✅ Connecté en tant que ${client.user?.tag}`);
+    await (0, updateMessage_1.updateGlobalMessage)(client);
 });
 client.on('interactionCreate', async (interaction) => {
     try {

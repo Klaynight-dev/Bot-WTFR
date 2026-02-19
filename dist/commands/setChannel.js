@@ -16,6 +16,8 @@ exports.data = new discord_js_1.SlashCommandBuilder()
 async function execute(interaction, client) {
     const channel = interaction.options.getChannel('channel', true);
     console.log(`[cmd:setchannel] /setchannel by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} -> targetChannel=${channel.id}`);
+    // avoid interaction timeout while updateGlobalMessage runs
+    await interaction.deferReply({ flags: discord_js_1.MessageFlags.Ephemeral });
     const msgRow = await prisma_1.default.messageState.findFirst();
     if (msgRow) {
         await prisma_1.default.messageState.update({ where: { id: msgRow.id }, data: { channelId: channel.id, messageId: null, page: 0 } });
@@ -25,10 +27,13 @@ async function execute(interaction, client) {
     }
     try {
         await (0, updateMessage_1.updateGlobalMessage)(client);
-        await interaction.reply({ content: `✅ Salon de listing défini sur <#${channel.id}>.`, ephemeral: true });
+        await interaction.editReply({ content: `✅ Salon de listing défini sur <#${channel.id}>.` });
     }
     catch (err) {
         console.error(err);
-        await interaction.reply({ content: "❌ Erreur lors de la mise à jour du message public.", ephemeral: true });
+        try {
+            await interaction.editReply({ content: "❌ Erreur lors de la mise à jour du message public." });
+        }
+        catch (_) { }
     }
 }

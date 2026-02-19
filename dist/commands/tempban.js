@@ -16,10 +16,10 @@ async function execute(interaction) {
     const reason = interaction.options.getString('raison') || 'Aucune raison fournie';
     console.log(`[cmd:tempban] /tempban by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} minutes=${minutes} reason=${reason}`);
     if (!interaction.guild)
-        return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', ephemeral: true });
+        return interaction.reply({ content: 'Commande utilisable uniquement en serveur.', flags: discord_js_1.MessageFlags.Ephemeral });
     try {
         await interaction.guild.members.ban(user.id, { reason });
-        await interaction.reply({ content: `✅ ${user.tag} banni pour ${minutes} minute(s). (attention : ne survive pas au redémarrage du bot)`, ephemeral: true });
+        await interaction.reply({ content: `✅ ${user.tag} banni pour ${minutes} minute(s). (attention : ne survive pas au redémarrage du bot)`, flags: discord_js_1.MessageFlags.Ephemeral });
         const ms = minutes * 60 * 1000;
         setTimeout(async () => {
             try {
@@ -33,6 +33,6 @@ async function execute(interaction) {
     }
     catch (err) {
         console.error(err);
-        await interaction.reply({ content: '❌ Impossible de bannir ce membre.', ephemeral: true });
+        await interaction.reply({ content: '❌ Impossible de bannir ce membre.', flags: discord_js_1.MessageFlags.Ephemeral });
     }
 }
