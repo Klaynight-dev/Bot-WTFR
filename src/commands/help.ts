@@ -21,10 +21,11 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     const opts = (json.options || []).map((o: any) => `• \`/${json.name} ${o.required ? `<${o.name}>` : `[${o.name}]`}\` — ${o.description}`).join('\n')
 
     const embed = createEmbed({
-      title: `❓ Aide : /${json.name}`,
-      description: json.description || '—',
+      title: `❔ Aide : /${json.name}`,
+      description: json.description || 'Pas de description.',
       color: Colors.Info,
-      fields: opts ? [{ name: 'Options', value: opts }] : undefined
+      fields: opts ? [{ name: '🛠️ Options', value: opts }] : undefined,
+      footer: 'WarBot FR System'
     })
     return replyEmbed(interaction, embed)
   }
@@ -35,13 +36,13 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   commands.forEach((c: any) => {
     const json = c.data?.toJSON ? c.data.toJSON() : c.data
-    lines.push(`• \`/${json.name}\` — ${json.description || '—'}`)
+    lines.push(`> \`/${json.name}\` — ${json.description || '—'}`)
   })
 
   const embed = createEmbed({
-    title: `${Emojis.Info} Commandes disponibles`,
-    description: lines.join('\n'),
-    color: Colors.Info,
+    title: `📚 Liste des commandes`,
+    description: `Voici la liste des commandes disponibles sur le bot.\n\n${lines.join('\n')}`,
+    color: Colors.Primary,
     footer: 'Utilise /help <commande> pour plus de détails.'
   })
 

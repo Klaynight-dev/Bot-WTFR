@@ -9,13 +9,18 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   const apiLatency = Math.round((client as any).ws?.ping ?? 0)
   const roundtrip = Date.now() - interaction.createdTimestamp
 
+  let color = Colors.Success
+  if (apiLatency > 200) color = Colors.Warning
+  if (apiLatency > 500) color = Colors.Error
+
   const embed = createEmbed({
-    title: 'Pong! 🏓',
-    color: Colors.Primary,
+    title: '🏓 Pong !',
+    color: color,
     fields: [
-      { name: 'API', value: `${apiLatency} ms`, inline: true },
-      { name: 'Réponse', value: `${roundtrip} ms`, inline: true }
-    ]
+      { name: '📡 Latence API', value: `\`${apiLatency} ms\``, inline: true },
+      { name: '⚡ Latence Bot', value: `\`${roundtrip} ms\``, inline: true }
+    ],
+    footer: 'WarBot FR System'
   })
 
   await replyEphemeralEmbed(interaction, embed)

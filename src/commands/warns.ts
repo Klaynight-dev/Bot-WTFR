@@ -16,15 +16,19 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   if (userWarnings.length === 0) return replyEmbed(interaction, createEmbed({
     title: 'Avertissements',
-    description: 'Aucun avertissement pour cet utilisateur.',
-    color: Colors.Success // Green because it's good to have no warns
+    description: '✅ Aucun avertissement pour cet utilisateur.',
+    color: Colors.Success
   }))
 
+  const lines = userWarnings.map((w: any, i: number) => {
+    return `**#${i + 1}** • <t:${Math.floor(new Date(w.date).getTime() / 1000)}:R> par <@${w.moderatorId}>\n> \`${w.reason}\``
+  })
+
   const embed = createEmbed({
-    title: `${Emojis.Info} Avertissements — ${user.tag}`,
-    description: userWarnings.map((w: any, i: number) => `**${i + 1}.** ${w.reason} — <@${w.moderatorId}> (${new Date(w.date).toLocaleString()})`).join('\n'),
+    title: `⚠️ Avertissements — ${user.tag}`,
+    description: lines.join('\n\n'),
     color: Colors.Warning,
-    footer: `${userWarnings.length} avertissement(s)`
+    footer: `Total: ${userWarnings.length} avertissement(s)`
   })
 
   await replyEmbed(interaction, embed)

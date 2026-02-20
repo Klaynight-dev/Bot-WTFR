@@ -23,17 +23,19 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   console.log(`[cmd:info] /info by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'}`)
 
   const embed = createEmbed({
-    title: `${Emojis.Info} Informations du bot`,
-    color: Colors.Info,
+    title: `🤖 Informations du bot`,
+    color: Colors.Primary,
+    description: `Serveur officiel: [Support](https://discord.gg/w7fr) • Développé avec ❤️`,
     fields: [
-      { name: 'Version', value: `v${pkg.version}`, inline: true },
-      { name: 'Uptime', value: formatUptime(client.uptime ?? 0), inline: true },
-      { name: 'Serveurs', value: `${client.guilds.cache.size}`, inline: true },
-      { name: 'Utilisateurs', value: `${client.users.cache.size}`, inline: true },
-      { name: 'Commandes', value: `${(client as any).commands?.size ?? 0}`, inline: true },
-      { name: 'Ping', value: `${client.ws.ping}ms`, inline: true }
+      { name: '📦 Version', value: `\`v${pkg.version}\``, inline: true },
+      { name: '⏱️ Uptime', value: `\`${formatUptime(client.uptime ?? 0)}\``, inline: true },
+      { name: '📡 Ping', value: `\`${client.ws.ping}ms\``, inline: true },
+      { name: '🛡️ Serveurs', value: `\`${client.guilds.cache.size}\``, inline: true },
+      { name: '👥 Utilisateurs', value: `\`${client.users.cache.size}\``, inline: true },
+      { name: '💻 Commandes', value: `\`${(client as any).commands?.size ?? 0}\``, inline: true }
     ],
-    thumbnail: client.user?.displayAvatarURL()
+    thumbnail: client.user?.displayAvatarURL(),
+    footer: 'WarBot FR System'
   })
 
   await replyEmbed(interaction, embed)

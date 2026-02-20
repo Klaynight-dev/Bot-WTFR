@@ -19,14 +19,15 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   await prisma.warning.create({ data: { userId: user.id, moderatorId: interaction.user.id, reason } })
 
   const embed = createEmbed({
-    title: `${Emojis.Warning} Avertissement`,
-    description: `<@${user.id}> a reçu un avertissement.`,
+    title: `⚠️ Avertissement`,
+    description: `Un utilisateur a reçu un avertissement.`,
     color: Colors.Warning,
     fields: [
-      { name: 'Raison', value: reason || 'Aucune raison fournie' },
-      { name: 'Modérateur', value: `<@${interaction.user.id}>` }
+      { name: '👤 Utilisateur', value: `<@${user.id}>`, inline: true },
+      { name: '🛡️ Modérateur', value: `<@${interaction.user.id}>`, inline: true },
+      { name: '📄 Raison', value: `\`\`\`${reason || 'Aucune raison fournie'}\`\`\`` }
     ],
-    footer: 'Sanction'
+    footer: `Warn ID: ${Date.now().toString(36).toUpperCase()}`
   })
 
   await sendPublicOrSecret(interaction, embed, secret)

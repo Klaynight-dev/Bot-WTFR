@@ -1,0 +1,5 @@
+
+> wtfr-bot@1.6.0 build
+> tsc
+
+src/dashboard/strategies/discord.ts(3,32): error TS2307: Cannot find module 'passport-oauth2' or its corresponding type declarations.

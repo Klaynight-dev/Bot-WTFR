@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -47,4 +48,49 @@ model Ticket {
   userId    String   // User who opened ticket
   closed    Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+// LEVELING SYSTEM MODELS
+
+model Level {
+  id              Int      @id @default(autoincrement())
+  userId          String
+  guildId         String
+  xp              Int      @default(0)
+  level           Int      @default(0)
+  lastMessageDate DateTime @default(now())
+  lastVoiceDate   DateTime?
+
+  @@unique([userId, guildId])
+}
+
+model LevelConfig {
+  guildId             String   @id
+  enabled             Boolean  @default(true)
+  messageXpMin        Int      @default(15)
+  messageXpMax        Int      @default(25)
+  voiceXp             Int      @default(10) // XP per voiceInterval
+  voiceInterval       Int      @default(60) // Seconds
+  cooldown            Int      @default(60) // Seconds
+  announceChannelId   String?  // If null, announce in context channel or DM?
+  announceMessage     String?  // Custom message
+  levelUpNotification Boolean  @default(true)
+}
+
+model LevelReward {
+  id      Int    @id @default(autoincrement())
+  guildId String
+  level   Int
+  roleId  String
+  stack   Boolean @default(true) // Keep previous roles?
+
+  @@unique([guildId, level])
+}
+
+model LevelMultiplier {
+  id         Int     @id @default(autoincrement())
+  guildId    String
+  targetId   String  // Role ID or Channel ID or User ID
+  type       String  // "ROLE", "CHANNEL", "USER"
+  multiplier Float
 }
