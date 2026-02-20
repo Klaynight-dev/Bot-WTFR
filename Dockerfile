@@ -14,6 +14,8 @@ COPY src ./src
 
 RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
+RUN npx prisma generate
+
 RUN pnpm run build
 
 FROM node:20-alpine AS runner
