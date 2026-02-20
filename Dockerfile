@@ -29,11 +29,9 @@ ENV NODE_ENV=production
 COPY package.json pnpm-lock.yaml ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-# We need scripts in runner too for "clean-commands"
 COPY --from=builder /app/scripts ./scripts
 
 USER node
 
-# Use "npm run go" to clean commands before starting
-CMD ["npm", "run", "go"]
+CMD ["npm", "run", "start:docker"]
 

@@ -1,6 +1,6 @@
 {
   "name": "wtfr-bot",
-  "version": "1.7.6",
+  "version": "1.7.7",
   "description": "Bot pseudo WTFR",
   "main": "dist/index.js",
   "scripts": {
@@ -10,8 +10,10 @@
     "deploy-only": "node dist/deploy-commands.js",
     "deploy": "npm run build && npm run deploy-only --",
     "deploy:guild": "npm run build && npm run deploy-only -- --scope=guild",
+    "deploy:guild:dist": "npm run deploy-only -- --scope=guild",
     "deploy:global": "npm run build && npm run deploy-only -- --scope=global",
     "go": "npm run deploy:guild && npm run start",
+    "start:docker": "npm run deploy:guild:dist && npm run start",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
