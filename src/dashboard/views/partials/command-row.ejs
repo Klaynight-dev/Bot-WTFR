@@ -1,0 +1,15 @@
+<div class="command-row" data-command="<%= cmd.name %>">
+    <div class="command-info">
+        <span class="command-name">/<%= cmd.name %></span>
+        <span class="command-desc">
+            <%= cmd.description %>
+        </span>
+    </div>
+    <div class="command-actions">
+        <label class="toggle-switch">
+            <input type="checkbox" class="command-toggle" data-command="<%= cmd.name %>" <%=cmd.enabled ? 'checked' : ''
+                %>>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+</div>

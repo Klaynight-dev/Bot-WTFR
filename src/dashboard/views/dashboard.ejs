@@ -2,70 +2,480 @@
     <%- include('partials/header', { user }) %>
         <main>
 
-            <%# ═══ PAGE: DASHBOARD (Guild List) ═══ %>
+            <%# ═══ DASHBOARD HEADER ═══ %>
 
-                <h1 class="animate-in">Tableau de Bord</h1>
-                <p class="animate-in delay-1" style="margin-bottom: 2rem;">
-                    Bienvenue, <strong style="color: var(--neon);">
-                        <%= user.username %>
-                    </strong> — voici vos zones d'opération.
-                </p>
-
-                <!-- SERVER LIST -->
-                <div class="card animate-in delay-2">
-                    <h2>
-                        <img src="/assets/img/castle.svg" alt="" class="icon icon-neon">
-                        Serveurs Configurés
-                    </h2>
-                    <p style="margin-bottom: 1rem;">Configurations actives du bot sur vos serveurs.</p>
-
-                    <% if (guilds && guilds.length> 0) { %>
-                        <div class="grid grid-2">
-                            <% guilds.forEach(function(guild) { %>
-                                <%- include('partials/server-card', { guild }) %>
-                                    <% }); %>
-                        </div>
-                        <% } else { %>
-                            <div class="empty-state">
-                                <div class="empty-state-icon">
-                                    <img src="/assets/img/radar.svg" alt="" class="icon-xl icon-muted">
-                                </div>
-                                <p class="empty-state-title">Aucune intel disponible</p>
-                                <p class="empty-state-desc">Aucune configuration de serveur trouvée dans la base de
-                                    données.</p>
+                <div class="dashboard-header animate-in">
+                    <div class="server-header">
+                        <div class="server-info">
+                            <div class="server-icon">
+                                <% if (guild.icon) { %>
+                                    <img src="<%= guild.icon %>" alt=""
+                                        style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+                                    <% } else { %>
+                                        <span style="font-size:1.4rem;font-weight:700;">
+                                            <%= guild.name.charAt(0) %>
+                                        </span>
+                                        <% } %>
                             </div>
-                            <% } %>
-                </div>
-
-                <!-- LIVE STATS SECTION -->
-                <div class="card animate-in delay-3">
-                    <h2>
-                        <img src="/assets/img/chart.svg" alt="" class="icon icon-neon">
-                        Statistiques en direct
-                    </h2>
-                    <div class="stats-bar" id="dashboard-stats">
-                        <div class="stat-item">
-                            <img src="/assets/img/clock.svg" alt="" class="stat-icon icon-neon">
-                            <div class="stat-value stat-value--neon" id="live-uptime">—</div>
-                            <div class="stat-label">Uptime</div>
-                        </div>
-                        <div class="stat-item">
-                            <img src="/assets/img/castle.svg" alt="" class="stat-icon icon-blurple">
-                            <div class="stat-value stat-value--blurple" id="live-guilds">—</div>
-                            <div class="stat-label">Serveurs</div>
-                        </div>
-                        <div class="stat-item">
-                            <img src="/assets/img/shield.svg" alt="" class="stat-icon icon-amber">
-                            <div class="stat-value stat-value--amber" id="live-members">—</div>
-                            <div class="stat-label">Membres</div>
-                        </div>
-                        <div class="stat-item">
-                            <img src="/assets/img/commands.svg" alt="" class="stat-icon icon-neon">
-                            <div class="stat-value stat-value--neon" id="live-commands">—</div>
-                            <div class="stat-label">Commandes</div>
+                            <div>
+                                <h1>
+                                    <%= guild.name %>
+                                </h1>
+                                <p class="text-muted">
+                                    <%= guild.memberCount %> membres
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <%# ═══ TAB NAVIGATION ═══ %>
+                    <%- include('partials/tab-nav', { tab }) %>
+
+                        <%# ══════════════════════════════════════════════════════════════ %>
+                            <%# TAB: GÉNÉRAL %>
+                                <%# ══════════════════════════════════════════════════════════════ %>
+                                    <div class="tab-content <%= tab === 'general' ? 'tab-content--active' : '' %>"
+                                        id="tab-general">
+
+                                        <form id="configForm" class="settings-form">
+                                            <h2 class="section-title">📡 Canaux</h2>
+                                            <div class="grid-2">
+                                                <%- include('partials/setting-field', { label: 'Salon de logs' ,
+                                                    name: 'logChannelId' , type: 'select' , options: textChannels,
+                                                    value: config.logChannelId, hint: 'Logs généraux du serveur' }) %>
+                                                    <%- include('partials/setting-field', { label: 'Logs modération' ,
+                                                        name: 'modLogChannelId' , type: 'select' , options:
+                                                        textChannels, value: config.modLogChannelId,
+                                                        hint: 'Ban, kick, warn, mute' }) %>
+                                                        <%- include('partials/setting-field', { label: 'Logs panel' ,
+                                                            name: 'panelLogChannelId' , type: 'select' , options:
+                                                            textChannels, value: config.panelLogChannelId,
+                                                            hint: 'Actions effectuées sur le dashboard' }) %>
+                                                            <%- include('partials/setting-field', {
+                                                                label: 'Salon bienvenue' , name: 'welcomeChannelId' ,
+                                                                type: 'select' , options: textChannels, value:
+                                                                config.welcomeChannelId, hint: 'Message de bienvenue' })
+                                                                %>
+                                                                <%- include('partials/setting-field', {
+                                                                    label: 'Salon au revoir' , name: 'goodbyeChannelId'
+                                                                    , type: 'select' , options: textChannels, value:
+                                                                    config.goodbyeChannelId, hint: 'Message de départ'
+                                                                    }) %>
+                                                                    <%- include('partials/setting-field', {
+                                                                        label: 'Catégorie tickets' ,
+                                                                        name: 'ticketCategoryId' , type: 'select' ,
+                                                                        options: categories, value:
+                                                                        config.ticketCategoryId,
+                                                                        hint: 'Catégorie pour les tickets' }) %>
+                                            </div>
+
+                                            <h2 class="section-title">🎖️ Rôles</h2>
+                                            <div class="grid-2">
+                                                <%- include('partials/setting-field', { label: 'Auto-rôle' ,
+                                                    name: 'autoRole' , type: 'select' , options: roles, value:
+                                                    config.autoRole, hint: 'Rôle donné automatiquement aux nouveaux' })
+                                                    %>
+                                            </div>
+
+                                            <div class="grid-2">
+                                                <div class="form-group">
+                                                    <label class="form-label">Rôles Staff</label>
+                                                    <select name="staffRoles"
+                                                        class="form-input form-select multi-select" multiple>
+                                                        <% roles.forEach(role=> { %>
+                                                            <option value="<%= role.id %>"
+                                                                style="color: <%= role.color %>" <%=(config.staffRoles
+                                                                || []).includes(role.id) ? 'selected' : '' %>><%=
+                                                                    role.name %>
+                                                            </option>
+                                                            <% }) %>
+                                                    </select>
+                                                    <span class="form-hint">Rôles considérés comme staff (Ctrl+clic pour
+                                                        sélection multiple)</span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Rôles accès Panel</label>
+                                                    <select name="panelRoles"
+                                                        class="form-input form-select multi-select" multiple>
+                                                        <% roles.forEach(role=> { %>
+                                                            <option value="<%= role.id %>"
+                                                                style="color: <%= role.color %>" <%=(config.panelRoles
+                                                                || []).includes(role.id) ? 'selected' : '' %>><%=
+                                                                    role.name %>
+                                                            </option>
+                                                            <% }) %>
+                                                    </select>
+                                                    <span class="form-hint">Rôles pouvant accéder au dashboard</span>
+                                                </div>
+                                            </div>
+
+                                            <h2 class="section-title">✉️ Messages personnalisés</h2>
+                                            <div class="grid-2">
+                                                <div class="form-group">
+                                                    <label class="form-label">Message de bienvenue</label>
+                                                    <textarea name="welcomeMessage" class="form-input form-textarea"
+                                                        rows="3"
+                                                        placeholder="Bienvenue {user} sur {server} ! Tu es le membre #{count}"><%= config.welcomeMessage || '' %></textarea>
+                                                    <span class="form-hint">Variables : {user} {server} {count}</span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Message d'au revoir</label>
+                                                    <textarea name="goodbyeMessage" class="form-input form-textarea"
+                                                        rows="3"
+                                                        placeholder="{user} a quitté {server}. Nous sommes maintenant {count}."><%= config.goodbyeMessage || '' %></textarea>
+                                                    <span class="form-hint">Variables : {user} {server} {count}</span>
+                                                </div>
+                                            </div>
+
+                                            <h2 class="section-title">🛡️ Auto-Modération</h2>
+                                            <div class="grid-2">
+                                                <%- include('partials/setting-field', { label: 'Anti-Spam' ,
+                                                    name: 'antiSpam' , type: 'toggle' , value: config.antiSpam,
+                                                    hint: 'Détecte les messages en masse' }) %>
+                                                    <%- include('partials/setting-field', { label: 'Anti-Lien' ,
+                                                        name: 'antiLink' , type: 'toggle' , value: config.antiLink,
+                                                        hint: 'Supprime les liens non autorisés' }) %>
+                                                        <%- include('partials/setting-field', { label: 'Anti-Invite' ,
+                                                            name: 'antiInvite' , type: 'toggle' , value:
+                                                            config.antiInvite, hint: 'Supprime les invitations Discord'
+                                                            }) %>
+                                                            <%- include('partials/setting-field', {
+                                                                label: 'Anti-Majuscules' , name: 'antiMajuscules' ,
+                                                                type: 'toggle' , value: config.antiMajuscules,
+                                                                hint: 'Limite les messages tout en majuscules' }) %>
+                                                                <%- include('partials/setting-field', {
+                                                                    label: 'Image bienvenue' ,
+                                                                    name: 'welcomeImageEnabled' , type: 'toggle' ,
+                                                                    value: config.welcomeImageEnabled !==false,
+                                                                    hint: 'Envoyer une image de bienvenue' }) %>
+                                            </div>
+
+                                            <div class="settings-actions">
+                                                <button type="submit" class="btn btn-primary" id="saveConfigBtn">
+                                                    <img src="/assets/img/save.svg" alt="" class="icon"> Sauvegarder
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <%# ══════════════════════════════════════════════════════════════ %>
+                                        <%# TAB: COMMANDES %>
+                                            <%# ══════════════════════════════════════════════════════════════ %>
+                                                <div class="tab-content <%= tab === 'commands' ? 'tab-content--active' : '' %>"
+                                                    id="tab-commands">
+
+                                                    <div class="commands-header">
+                                                        <h2 class="section-title">🔧 Gestion des Commandes (<%=
+                                                                commandList.length %>)</h2>
+                                                        <div class="commands-search">
+                                                            <input type="text" id="commandSearch" class="form-input"
+                                                                placeholder="Rechercher une commande...">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="commands-list" id="commandsList">
+                                                        <% commandList.forEach(cmd=> { %>
+                                                            <%- include('partials/command-row', { cmd }) %>
+                                                                <% }) %>
+                                                    </div>
+
+                                                    <% if (commandList.length===0) { %>
+                                                        <p class="text-muted text-center">Aucune commande chargée.</p>
+                                                        <% } %>
+                                                </div>
+
+                                                <%# ══════════════════════════════════════════════════════════════ %>
+                                                    <%# TAB: MODÉRATION %>
+                                                        <%# ══════════════════════════════════════════════════════════════
+                                                            %>
+                                                            <div class="tab-content <%= tab === 'moderation' ? 'tab-content--active' : '' %>"
+                                                                id="tab-moderation">
+
+                                                                <h2 class="section-title">📊 Statistiques de Modération
+                                                                </h2>
+
+                                                                <div class="stats-bar animate-in">
+                                                                    <div class="stat-item">
+                                                                        <img src="/assets/img/shield.svg" alt=""
+                                                                            class="stat-icon icon-amber">
+                                                                        <div class="stat-value stat-value--amber">
+                                                                            <%= modStats.warns %>
+                                                                        </div>
+                                                                        <div class="stat-label">Avertissements</div>
+                                                                    </div>
+                                                                    <div class="stat-item">
+                                                                        <img src="/assets/img/ticket.svg" alt=""
+                                                                            class="stat-icon icon-blurple">
+                                                                        <div class="stat-value stat-value--blurple">
+                                                                            <%= modStats.tickets %>
+                                                                        </div>
+                                                                        <div class="stat-label">Tickets total</div>
+                                                                    </div>
+                                                                    <div class="stat-item">
+                                                                        <img src="/assets/img/ticket.svg" alt=""
+                                                                            class="stat-icon icon-neon">
+                                                                        <div class="stat-value stat-value--neon">
+                                                                            <%= modStats.openTickets %>
+                                                                        </div>
+                                                                        <div class="stat-label">Tickets ouverts</div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <h2 class="section-title">🛡️ Configuration Staff</h2>
+                                                                <p class="text-muted">Les rôles staff sont configurés
+                                                                    dans l'onglet Général → Rôles Staff.</p>
+                                                                <p class="text-muted">Les commandes de modération (ban,
+                                                                    kick, mute, warn) peuvent être activées/désactivées
+                                                                    dans l'onglet Commandes.</p>
+                                                            </div>
+
+                                                            <%# ══════════════════════════════════════════════════════════════
+                                                                %>
+                                                                <%# TAB: LEVELING %>
+                                                                    <%# ══════════════════════════════════════════════════════════════
+                                                                        %>
+                                                                        <div class="tab-content <%= tab === 'leveling' ? 'tab-content--active' : '' %>"
+                                                                            id="tab-leveling">
+
+                                                                            <form id="levelingForm"
+                                                                                class="settings-form">
+                                                                                <h2 class="section-title">📊 Système de
+                                                                                    Niveaux</h2>
+
+                                                                                <div class="grid-2">
+                                                                                    <%- include('partials/setting-field',
+                                                                                        { label: 'Système activé' ,
+                                                                                        name: 'enabled' , type: 'toggle'
+                                                                                        , value: levelConfig ?
+                                                                                        levelConfig.enabled : true,
+                                                                                        hint: 'Activer/désactiver le système de niveaux'
+                                                                                        }) %>
+                                                                                        <%- include('partials/setting-field',
+                                                                                            { label: 'Notif level up' ,
+                                                                                            name: 'levelUpNotification'
+                                                                                            , type: 'toggle' , value:
+                                                                                            levelConfig ?
+                                                                                            levelConfig.levelUpNotification
+                                                                                            : true,
+                                                                                            hint: 'Envoyer un message quand un membre monte de niveau'
+                                                                                            }) %>
+                                                                                </div>
+
+                                                                                <h2 class="section-title">⚡
+                                                                                    Configuration XP</h2>
+                                                                                <div class="grid-2">
+                                                                                    <div class="form-group">
+                                                                                        <label class="form-label">XP min
+                                                                                            par message</label>
+                                                                                        <input type="number"
+                                                                                            name="messageXpMin"
+                                                                                            class="form-input"
+                                                                                            value="<%= levelConfig ? levelConfig.messageXpMin : 15 %>"
+                                                                                            min="1" max="100">
+                                                                                    </div>
+                                                                                    <div class="form-group">
+                                                                                        <label class="form-label">XP max
+                                                                                            par message</label>
+                                                                                        <input type="number"
+                                                                                            name="messageXpMax"
+                                                                                            class="form-input"
+                                                                                            value="<%= levelConfig ? levelConfig.messageXpMax : 25 %>"
+                                                                                            min="1" max="100">
+                                                                                    </div>
+                                                                                    <div class="form-group">
+                                                                                        <label class="form-label">XP
+                                                                                            vocal (par
+                                                                                            intervalle)</label>
+                                                                                        <input type="number"
+                                                                                            name="voiceXp"
+                                                                                            class="form-input"
+                                                                                            value="<%= levelConfig ? levelConfig.voiceXp : 10 %>"
+                                                                                            min="1" max="100">
+                                                                                    </div>
+                                                                                    <div class="form-group">
+                                                                                        <label
+                                                                                            class="form-label">Intervalle
+                                                                                            vocal (sec)</label>
+                                                                                        <input type="number"
+                                                                                            name="voiceInterval"
+                                                                                            class="form-input"
+                                                                                            value="<%= levelConfig ? levelConfig.voiceInterval : 60 %>"
+                                                                                            min="10" max="600">
+                                                                                    </div>
+                                                                                    <div class="form-group">
+                                                                                        <label
+                                                                                            class="form-label">Cooldown
+                                                                                            message (sec)</label>
+                                                                                        <input type="number"
+                                                                                            name="cooldown"
+                                                                                            class="form-input"
+                                                                                            value="<%= levelConfig ? levelConfig.cooldown : 60 %>"
+                                                                                            min="0" max="600">
+                                                                                    </div>
+                                                                                    <%- include('partials/setting-field',
+                                                                                        { label: 'Salon annonces' ,
+                                                                                        name: 'announceChannelId' ,
+                                                                                        type: 'select' , options:
+                                                                                        textChannels, value: levelConfig
+                                                                                        ? levelConfig.announceChannelId
+                                                                                        : null,
+                                                                                        hint: 'Salon pour les annonces de level up (vide = salon du message)'
+                                                                                        }) %>
+                                                                                </div>
+
+                                                                                <div class="form-group">
+                                                                                    <label class="form-label">Message
+                                                                                        d'annonce</label>
+                                                                                    <textarea name="announceMessage"
+                                                                                        class="form-input form-textarea"
+                                                                                        rows="2"
+                                                                                        placeholder="🎉 {user} vient de passer au niveau {level} !"><%= levelConfig && levelConfig.announceMessage ? levelConfig.announceMessage : '' %></textarea>
+                                                                                    <span class="form-hint">Variables :
+                                                                                        {user} {level}</span>
+                                                                                </div>
+
+                                                                                <div class="settings-actions">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-primary"
+                                                                                        id="saveLevelingBtn">
+                                                                                        <img src="/assets/img/save.svg"
+                                                                                            alt="" class="icon">
+                                                                                        Sauvegarder leveling
+                                                                                    </button>
+                                                                                </div>
+                                                                            </form>
+
+                                                                            <h2 class="section-title">🏆 Récompenses par
+                                                                                niveau</h2>
+                                                                            <% if (levelRewards && levelRewards.length>
+                                                                                0) { %>
+                                                                                <div class="rewards-list">
+                                                                                    <% levelRewards.forEach(reward=> {
+                                                                                        %>
+                                                                                        <div class="reward-row">
+                                                                                            <span
+                                                                                                class="reward-level">Niveau
+                                                                                                <%= reward.level %>
+                                                                                                    </span>
+                                                                                            <span
+                                                                                                class="reward-role">Rôle
+                                                                                                : <%= reward.roleId %>
+                                                                                                    </span>
+                                                                                            <span class="reward-stack">
+                                                                                                <%= reward.stack
+                                                                                                    ? '📦 Cumulable'
+                                                                                                    : '🔄 Remplacement'
+                                                                                                    %>
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <% }) %>
+                                                                                </div>
+                                                                                <% } else { %>
+                                                                                    <p class="text-muted">Aucune
+                                                                                        récompense configurée. Utilisez
+                                                                                        <code>/levels reward</code> pour
+                                                                                        en ajouter.</p>
+                                                                                    <% } %>
+
+                                                                                        <% if (levelMultipliers &&
+                                                                                            levelMultipliers.length> 0)
+                                                                                            { %>
+                                                                                            <h2 class="section-title">✖️
+                                                                                                Multiplicateurs XP</h2>
+                                                                                            <div
+                                                                                                class="multipliers-list">
+                                                                                                <%
+                                                                                                    levelMultipliers.forEach(m=>
+                                                                                                    { %>
+                                                                                                    <div
+                                                                                                        class="multiplier-row">
+                                                                                                        <span
+                                                                                                            class="multiplier-type">
+                                                                                                            <%= m.type
+                                                                                                                %>
+                                                                                                        </span>
+                                                                                                        <span
+                                                                                                            class="multiplier-target">
+                                                                                                            <%= m.targetId
+                                                                                                                %>
+                                                                                                        </span>
+                                                                                                        <span
+                                                                                                            class="multiplier-value">
+                                                                                                            <%= m.multiplier
+                                                                                                                %>×
+                                                                                                        </span>
+                                                                                                    </div>
+                                                                                                    <% }) %>
+                                                                                            </div>
+                                                                                            <% } %>
+                                                                        </div>
+
+                                                                        <%# ══════════════════════════════════════════════════════════════
+                                                                            %>
+                                                                            <%# TAB: LOGS %>
+                                                                                <%# ══════════════════════════════════════════════════════════════
+                                                                                    %>
+                                                                                    <div class="tab-content <%= tab === 'logs' ? 'tab-content--active' : '' %>"
+                                                                                        id="tab-logs">
+
+                                                                                        <div class="logs-header">
+                                                                                            <h2 class="section-title">📋
+                                                                                                Journal d'Audit</h2>
+                                                                                            <div class="logs-filters">
+                                                                                                <select
+                                                                                                    id="logSourceFilter"
+                                                                                                    class="form-input form-select">
+                                                                                                    <option value="">
+                                                                                                        Toutes les
+                                                                                                        sources</option>
+                                                                                                    <option
+                                                                                                        value="panel">
+                                                                                                        Panel</option>
+                                                                                                    <option value="bot">
+                                                                                                        Bot</option>
+                                                                                                    <option
+                                                                                                        value="discord">
+                                                                                                        Discord</option>
+                                                                                                </select>
+                                                                                                <input type="text"
+                                                                                                    id="logActionFilter"
+                                                                                                    class="form-input"
+                                                                                                    placeholder="Filtrer par action...">
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                        <div class="logs-list"
+                                                                                            id="logsList">
+                                                                                            <% if (auditLogs &&
+                                                                                                auditLogs.length> 0) {
+                                                                                                %>
+                                                                                                <%
+                                                                                                    auditLogs.forEach(log=>
+                                                                                                    { %>
+                                                                                                    <%- include('partials/log-entry',
+                                                                                                        { log }) %>
+                                                                                                        <% }) %>
+                                                                                                            <% } else {
+                                                                                                                %>
+                                                                                                                <p
+                                                                                                                    class="text-muted text-center">
+                                                                                                                    Aucun
+                                                                                                                    log
+                                                                                                                    enregistré.
+                                                                                                                </p>
+                                                                                                                <% } %>
+                                                                                        </div>
+
+                                                                                        <div class="logs-pagination"
+                                                                                            id="logsPagination">
+                                                                                            <button
+                                                                                                class="btn btn-outline"
+                                                                                                id="loadMoreLogs"
+                                                                                                data-page="2">Charger
+                                                                                                plus</button>
+                                                                                        </div>
+                                                                                    </div>
 
         </main>
         <%- include('partials/footer') %>

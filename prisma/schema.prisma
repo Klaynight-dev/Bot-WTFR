@@ -23,7 +23,6 @@ model Warning {
   date        DateTime @default(now())
 }
 
-
 model MessageState {
   id        Int     @id @default(autoincrement())
   channelId String?
@@ -32,25 +31,65 @@ model MessageState {
 }
 
 model GuildConfig {
-  id             String   @id // Guild ID
-  logChannelId   String?
-  welcomeChannelId String?
-  ticketCategoryId String?
-  autoRole       String?
-  antiSpam       Boolean  @default(false)
-  antiLink       Boolean  @default(false)
-  updatedAt      DateTime @updatedAt
+  id                  String   @id // Guild ID
+  // ─── Channels ───
+  logChannelId        String?
+  modLogChannelId     String?  // Logs modération séparés
+  panelLogChannelId   String?  // Logs actions panel
+  welcomeChannelId    String?
+  goodbyeChannelId    String?
+  ticketCategoryId    String?
+
+  // ─── Roles ───
+  autoRole            String?
+  staffRoles          String[] // Rôles staff (modérateurs)
+  panelRoles          String[] // Rôles ayant accès au dashboard
+  panelUsers          String[] // Users spécifiques autorisés panel
+
+  // ─── Auto-Moderation ───
+  antiSpam            Boolean  @default(false)
+  antiLink            Boolean  @default(false)
+  antiInvite          Boolean  @default(false)
+  antiMajuscules      Boolean  @default(false)
+
+  // ─── Welcome/Goodbye ───
+  welcomeMessage      String?  // Message custom: {user} {server} {count}
+  goodbyeMessage      String?
+  welcomeImageEnabled Boolean  @default(true)
+
+  updatedAt           DateTime @updatedAt
+}
+
+model CommandConfig {
+  id              Int      @id @default(autoincrement())
+  guildId         String
+  commandName     String
+  enabled         Boolean  @default(true)
+  allowedRoles    String[] // Vide = tout le monde (selon perms Discord)
+  allowedChannels String[] // Vide = partout
+  @@unique([guildId, commandName])
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  userId    String
+  userName  String
+  action    String   // "config.update", "command.toggle", "panel.login"
+  details   String?  // JSON détails
+  source    String   @default("panel") // "panel" | "bot" | "discord"
+  createdAt DateTime @default(now())
 }
 
 model Ticket {
   id        Int      @id @default(autoincrement())
-  channelId String   @unique // Ticket Channel ID
-  userId    String   // User who opened ticket
+  channelId String   @unique
+  userId    String
   closed    Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
-// LEVELING SYSTEM MODELS
+// ─── LEVELING SYSTEM ───
 
 model Level {
   id              Int      @id @default(autoincrement())
@@ -69,11 +108,11 @@ model LevelConfig {
   enabled             Boolean  @default(true)
   messageXpMin        Int      @default(15)
   messageXpMax        Int      @default(25)
-  voiceXp             Int      @default(10) // XP per voiceInterval
-  voiceInterval       Int      @default(60) // Seconds
-  cooldown            Int      @default(60) // Seconds
-  announceChannelId   String?  // If null, announce in context channel or DM?
-  announceMessage     String?  // Custom message
+  voiceXp             Int      @default(10)
+  voiceInterval       Int      @default(60)
+  cooldown            Int      @default(60)
+  announceChannelId   String?
+  announceMessage     String?
   levelUpNotification Boolean  @default(true)
 }
 
@@ -82,7 +121,7 @@ model LevelReward {
   guildId String
   level   Int
   roleId  String
-  stack   Boolean @default(true) // Keep previous roles?
+  stack   Boolean @default(true)
 
   @@unique([guildId, level])
 }
@@ -90,7 +129,7 @@ model LevelReward {
 model LevelMultiplier {
   id         Int     @id @default(autoincrement())
   guildId    String
-  targetId   String  // Role ID or Channel ID or User ID
+  targetId   String
   type       String  // "ROLE", "CHANNEL", "USER"
   multiplier Float
 }

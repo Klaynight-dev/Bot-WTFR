@@ -1,0 +1,14 @@
+<%- include('partials/head') %>
+    <%- include('partials/header', { user }) %>
+        <main>
+
+            <div class="forbidden-container animate-in">
+                <div class="forbidden-icon">🚫</div>
+                <h1>Accès Refusé</h1>
+                <p>Vous n'avez pas les permissions nécessaires pour accéder au panel.</p>
+                <p class="text-muted">Contactez un administrateur du serveur pour obtenir l'accès.</p>
+                <a href="/" class="btn btn-primary">Retour à l'accueil</a>
+            </div>
+
+        </main>
+        <%- include('partials/footer') %>

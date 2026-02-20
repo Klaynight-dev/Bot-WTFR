@@ -2,11 +2,53 @@ import { Router } from 'express'
 import prisma from '../../prisma'
 
 const router = Router()
+const GUILD_ID = process.env.GUILD_ID!
 
 // ─── Auth middleware ───
 function checkAuth(req: any, res: any, next: any) {
     if (req.isAuthenticated()) return next()
     res.redirect('/')
+}
+
+// ─── Panel access middleware ───
+async function checkPanelAccess(req: any, res: any, next: any) {
+    if (!req.isAuthenticated()) return res.redirect('/')
+
+    const client = req.bot
+    const guild = client.guilds.cache.get(GUILD_ID)
+    if (!guild) return res.status(503).send('Serveur introuvable — le bot doit être en ligne.')
+
+    const userId = req.user.id
+
+    // Owner always has access
+    if (guild.ownerId === userId) return next()
+
+    // Check panelUsers list
+    let config: any = null
+    try {
+        config = await prisma.guildConfig.findUnique({ where: { id: GUILD_ID } })
+    } catch { }
+
+    if (config?.panelUsers?.includes(userId)) return next()
+
+    // Check panelRoles via guild member
+    try {
+        const member = await guild.members.fetch(userId)
+        if (member) {
+            // Admin permission = access
+            if (member.permissions.has('Administrator')) return next()
+
+            // Check panelRoles
+            if (config?.panelRoles?.length) {
+                const hasRole = config.panelRoles.some((roleId: string) =>
+                    member.roles.cache.has(roleId)
+                )
+                if (hasRole) return next()
+            }
+        }
+    } catch { }
+
+    res.status(403).render('forbidden', { user: req.user })
 }
 
 // ─── Helper: format uptime ───
@@ -18,7 +60,7 @@ function formatUptime(ms: number): string {
     return `${m}m`
 }
 
-// ─── Home ───
+// ─── Home Page ───
 router.get('/', (req: any, res) => {
     const client = req.bot
     const stats = {
@@ -30,46 +72,89 @@ router.get('/', (req: any, res) => {
     res.render('index', { user: req.user, stats })
 })
 
-// ─── Dashboard (guild list) ───
-router.get('/dashboard', checkAuth, async (req: any, res) => {
+// ─── Dashboard (single-server tabs) ───
+router.get('/dashboard', checkPanelAccess, async (req: any, res) => {
     const client = req.bot
-    let guildConfigs: any[] = []
-    try {
-        guildConfigs = await prisma.guildConfig.findMany()
-    } catch {
-        console.warn('[Dashboard] GuildConfig table not found, showing empty list')
-    }
-
-    // Enrich configs with guild info from the bot cache
-    const guilds = guildConfigs.map((config: any) => {
-        const guild = client.guilds.cache.get(config.id)
-        return {
-            config,
-            name: guild?.name ?? 'Serveur inconnu',
-            icon: guild?.iconURL({ size: 64 }) ?? null,
-            memberCount: guild?.memberCount ?? 0,
-            available: !!guild
-        }
-    })
-
-    res.render('dashboard', { user: req.user, guilds })
-})
-
-// ─── Settings (per guild) ───
-router.get('/dashboard/:guildId', checkAuth, async (req: any, res) => {
-    const { guildId } = req.params
-    const guild = req.bot.guilds.cache.get(guildId)
+    const guild = client.guilds.cache.get(GUILD_ID)
 
     if (!guild) return res.send("Serveur introuvable ou le bot n'y est pas.")
 
+    // Fetch config
     let config: any = {}
     try {
-        config = await prisma.guildConfig.findUnique({ where: { id: guildId } }) || {}
-    } catch {
-        console.warn('[Dashboard] GuildConfig table not found')
-    }
+        config = await prisma.guildConfig.findUnique({ where: { id: GUILD_ID } }) || {}
+    } catch { }
 
-    // Get channels and roles for select dropdowns
+    // Fetch level config
+    let levelConfig: any = null
+    try {
+        levelConfig = await prisma.levelConfig.findUnique({ where: { guildId: GUILD_ID } })
+    } catch { }
+
+    // Fetch level rewards
+    let levelRewards: any[] = []
+    try {
+        levelRewards = await prisma.levelReward.findMany({
+            where: { guildId: GUILD_ID },
+            orderBy: { level: 'asc' }
+        })
+    } catch { }
+
+    // Fetch level multipliers
+    let levelMultipliers: any[] = []
+    try {
+        levelMultipliers = await prisma.levelMultiplier.findMany({
+            where: { guildId: GUILD_ID }
+        })
+    } catch { }
+
+    // Fetch command configs
+    let commandConfigs: any[] = []
+    try {
+        commandConfigs = await prisma.commandConfig.findMany({
+            where: { guildId: GUILD_ID }
+        })
+    } catch { }
+
+    // Build command list from bot
+    const commandList = Array.from(client.commands?.values() ?? []).map((cmd: any) => {
+        const cfg = commandConfigs.find((c: any) => c.commandName === cmd.data.name)
+        return {
+            name: cmd.data.name,
+            description: cmd.data.description,
+            enabled: cfg ? cfg.enabled : true,
+            allowedRoles: cfg?.allowedRoles ?? [],
+            allowedChannels: cfg?.allowedChannels ?? []
+        }
+    }).sort((a: any, b: any) => a.name.localeCompare(b.name))
+
+    // Fetch recent audit logs
+    let auditLogs: any[] = []
+    try {
+        auditLogs = await prisma.auditLog.findMany({
+            where: { guildId: GUILD_ID },
+            orderBy: { createdAt: 'desc' },
+            take: 50
+        })
+    } catch { }
+
+    // Fetch moderation stats
+    let warnCount = 0
+    try {
+        warnCount = await prisma.warning.count()
+    } catch { }
+
+    let ticketCount = 0
+    try {
+        ticketCount = await prisma.ticket.count()
+    } catch { }
+
+    let openTickets = 0
+    try {
+        openTickets = await prisma.ticket.count({ where: { closed: false } })
+    } catch { }
+
+    // Get channels and roles
     const textChannels = guild.channels.cache
         .filter((c: any) => c.type === 0)
         .map((c: any) => ({ id: c.id, name: c.name }))
@@ -85,43 +170,29 @@ router.get('/dashboard/:guildId', checkAuth, async (req: any, res) => {
         .map((r: any) => ({ id: r.id, name: r.name, color: r.hexColor }))
         .sort((a: any, b: any) => a.name.localeCompare(b.name))
 
-    res.render('settings', {
+    // Active tab from query
+    const tab = (req.query.tab as string) || 'general'
+
+    res.render('dashboard', {
         user: req.user,
-        guild: { id: guild.id, name: guild.name, icon: guild.iconURL({ size: 128 }) },
+        guild: {
+            id: guild.id,
+            name: guild.name,
+            icon: guild.iconURL({ size: 128 }),
+            memberCount: guild.memberCount
+        },
         config,
+        levelConfig,
+        levelRewards,
+        levelMultipliers,
+        commandList,
+        auditLogs,
+        modStats: { warns: warnCount, tickets: ticketCount, openTickets },
         textChannels,
         categories,
-        roles
+        roles,
+        tab
     })
-})
-
-// ─── POST Settings (fallback for non-JS) ───
-router.post('/dashboard/:guildId', checkAuth, async (req: any, res) => {
-    const { guildId } = req.params
-    const { logChannelId, welcomeChannelId, autoRole, ticketCategoryId } = req.body
-
-    try {
-        await prisma.guildConfig.upsert({
-            where: { id: guildId },
-            update: {
-                logChannelId: logChannelId || null,
-                welcomeChannelId: welcomeChannelId || null,
-                autoRole: autoRole || null,
-                ticketCategoryId: ticketCategoryId || null
-            },
-            create: {
-                id: guildId,
-                logChannelId: logChannelId || null,
-                welcomeChannelId: welcomeChannelId || null,
-                autoRole: autoRole || null,
-                ticketCategoryId: ticketCategoryId || null
-            }
-        })
-    } catch (err) {
-        console.error('[Dashboard] Error saving config:', err)
-    }
-
-    res.redirect(`/dashboard/${guildId}`)
 })
 
 export default router
