@@ -1,0 +1,15 @@
+<%# — Feature Card Component — %>
+    <%# Usage: include('partials/feature-card', { icon: 'radar' , color: 'neon' , title: 'Logs' , desc: 'Description...'
+        }) %>
+        <div class="card feature-card animate-in delay-<%= typeof delay !== 'undefined' ? delay : 1 %>">
+            <div class="feature-icon feature-icon--<%= color %>">
+                <img src="/assets/img/<%= icon %>.svg" alt="" class="icon-lg icon-<%= color %>">
+            </div>
+            <h2>
+                <img src="/assets/img/<%= icon %>.svg" alt="" class="icon icon-<%= color %>">
+                <%= title %>
+            </h2>
+            <p>
+                <%= desc %>
+            </p>
+        </div>

@@ -1,114 +1,71 @@
-<h1 class="animate-in">Tableau de Bord</h1>
-<p class="animate-in delay-1" style="margin-bottom: 2rem;">
-    Bienvenue, <strong style="color: var(--neon);">
-        <%= user.username %>
-    </strong> — voici vos zones d'opération.
-</p>
+<%- include('partials/head') %>
+    <%- include('partials/header', { user }) %>
+        <main>
 
-<!-- SERVER LIST -->
-<div class="card animate-in delay-2">
-    <h2>
-        <img src="/assets/img/castle.svg" alt="" class="icon icon-neon">
-        Serveurs Configurés
-    </h2>
-    <p style="margin-bottom: 1rem;">Configurations actives du bot sur vos serveurs.</p>
+            <%# ═══ PAGE: DASHBOARD (Guild List) ═══ %>
 
-    <% if (guildConfig && guildConfig.length> 0) { %>
-        <div class="grid grid-2">
-            <% guildConfig.forEach(function(config) { %>
-                <div class="card card-flat">
-                    <div class="server-header">
-                        <div class="server-info">
-                            <div class="server-icon">
-                                <img src="/assets/img/castle.svg" alt="" class="icon icon-white">
-                            </div>
-                            <div>
-                                <div class="server-name">Serveur</div>
-                                <div class="server-id">ID: <%= config.id %>
+                <h1 class="animate-in">Tableau de Bord</h1>
+                <p class="animate-in delay-1" style="margin-bottom: 2rem;">
+                    Bienvenue, <strong style="color: var(--neon);">
+                        <%= user.username %>
+                    </strong> — voici vos zones d'opération.
+                </p>
+
+                <!-- SERVER LIST -->
+                <div class="card animate-in delay-2">
+                    <h2>
+                        <img src="/assets/img/castle.svg" alt="" class="icon icon-neon">
+                        Serveurs Configurés
+                    </h2>
+                    <p style="margin-bottom: 1rem;">Configurations actives du bot sur vos serveurs.</p>
+
+                    <% if (guilds && guilds.length> 0) { %>
+                        <div class="grid grid-2">
+                            <% guilds.forEach(function(guild) { %>
+                                <%- include('partials/server-card', { guild }) %>
+                                    <% }); %>
+                        </div>
+                        <% } else { %>
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <img src="/assets/img/radar.svg" alt="" class="icon-xl icon-muted">
                                 </div>
+                                <p class="empty-state-title">Aucune intel disponible</p>
+                                <p class="empty-state-desc">Aucune configuration de serveur trouvée dans la base de
+                                    données.</p>
                             </div>
-                        </div>
-                        <span class="badge badge-neon">Actif</span>
-                    </div>
+                            <% } %>
+                </div>
 
-                    <div class="divider" style="margin: 0.75rem 0;"></div>
-
-                    <div class="server-grid">
-                        <div class="server-feature">
-                            <span class="server-feature-label">Logs:</span>
-                            <% if (config.logChannelId) { %>
-                                <span class="status-dot status-online"></span>
-                                <span style="color: var(--neon);">Actif</span>
-                                <% } else { %>
-                                    <span class="status-dot status-offline"></span>
-                                    <span style="color: var(--text-muted);">Inactif</span>
-                                    <% } %>
+                <!-- LIVE STATS SECTION -->
+                <div class="card animate-in delay-3">
+                    <h2>
+                        <img src="/assets/img/chart.svg" alt="" class="icon icon-neon">
+                        Statistiques en direct
+                    </h2>
+                    <div class="stats-bar" id="dashboard-stats">
+                        <div class="stat-item">
+                            <img src="/assets/img/clock.svg" alt="" class="stat-icon icon-neon">
+                            <div class="stat-value stat-value--neon" id="live-uptime">—</div>
+                            <div class="stat-label">Uptime</div>
                         </div>
-                        <div class="server-feature">
-                            <span class="server-feature-label">Bienvenue:</span>
-                            <% if (config.welcomeChannelId) { %>
-                                <span class="status-dot status-online"></span>
-                                <span style="color: var(--neon);">Actif</span>
-                                <% } else { %>
-                                    <span class="status-dot status-offline"></span>
-                                    <span style="color: var(--text-muted);">Inactif</span>
-                                    <% } %>
+                        <div class="stat-item">
+                            <img src="/assets/img/castle.svg" alt="" class="stat-icon icon-blurple">
+                            <div class="stat-value stat-value--blurple" id="live-guilds">—</div>
+                            <div class="stat-label">Serveurs</div>
                         </div>
-                        <div class="server-feature">
-                            <span class="server-feature-label">Auto-rôle:</span>
-                            <% if (config.autoRole) { %>
-                                <span class="status-dot status-online"></span>
-                                <span style="color: var(--neon);">Actif</span>
-                                <% } else { %>
-                                    <span class="status-dot status-offline"></span>
-                                    <span style="color: var(--text-muted);">Inactif</span>
-                                    <% } %>
+                        <div class="stat-item">
+                            <img src="/assets/img/shield.svg" alt="" class="stat-icon icon-amber">
+                            <div class="stat-value stat-value--amber" id="live-members">—</div>
+                            <div class="stat-label">Membres</div>
                         </div>
-                        <div class="server-feature">
-                            <span class="server-feature-label">Tickets:</span>
-                            <% if (config.ticketCategoryId) { %>
-                                <span class="status-dot status-online"></span>
-                                <span style="color: var(--neon);">Actif</span>
-                                <% } else { %>
-                                    <span class="status-dot status-offline"></span>
-                                    <span style="color: var(--text-muted);">Inactif</span>
-                                    <% } %>
+                        <div class="stat-item">
+                            <img src="/assets/img/commands.svg" alt="" class="stat-icon icon-neon">
+                            <div class="stat-value stat-value--neon" id="live-commands">—</div>
+                            <div class="stat-label">Commandes</div>
                         </div>
-                    </div>
-
-                    <div style="margin-top: 1rem;">
-                        <a href="/dashboard/<%= config.id %>" class="btn btn-ghost btn-sm btn-block">
-                            <img src="/assets/img/settings.svg" alt="" class="icon icon-sm icon-muted">
-                            Configurer
-                        </a>
                     </div>
                 </div>
-                <% }); %>
-        </div>
-        <% } else { %>
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <img src="/assets/img/radar.svg" alt="" class="icon-xl icon-muted">
-                </div>
-                <p class="empty-state-title">Aucune intel disponible</p>
-                <p class="empty-state-desc">Aucune configuration de serveur trouvée dans la base de données.</p>
-            </div>
-            <% } %>
-</div>
 
-<!-- STATS SECTION -->
-<div class="card animate-in delay-3">
-    <h2>
-        <img src="/assets/img/chart.svg" alt="" class="icon icon-neon">
-        Statistiques
-    </h2>
-    <div style="text-align: center; padding: 1.5rem;">
-        <div class="dev-badge">
-            <img src="/assets/img/hourglass.svg" alt="" class="icon icon-sm icon-amber">
-            En cours de développement
-        </div>
-        <p style="margin-top: 0.75rem; font-size: 0.85rem;">
-            Les statistiques détaillées arriveront prochainement.
-        </p>
-    </div>
-</div>
+        </main>
+        <%- include('partials/footer') %>

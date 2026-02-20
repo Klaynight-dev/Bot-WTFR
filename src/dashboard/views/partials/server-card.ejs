@@ -1,0 +1,57 @@
+<%# — Server Card Component — %>
+    <%# Usage: include('partials/server-card', { guild: { name, icon, config, memberCount, available } }) %>
+        <div class="card card-flat">
+            <div class="server-header">
+                <div class="server-info">
+                    <div class="server-icon">
+                        <% if (guild.icon) { %>
+                            <img src="<%= guild.icon %>" alt=""
+                                style="width:100%;height:100%;border-radius:8px;object-fit:cover;">
+                            <% } else { %>
+                                <img src="/assets/img/castle.svg" alt="" class="icon icon-white">
+                                <% } %>
+                    </div>
+                    <div>
+                        <div class="server-name">
+                            <%= guild.name %>
+                        </div>
+                        <div class="server-id">
+                            <span class="server-members">
+                                <%= guild.memberCount %> membres
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <span class="badge <%= guild.available ? 'badge-neon' : 'badge-amber' %>">
+                    <%= guild.available ? 'En ligne' : 'Hors ligne' %>
+                </span>
+            </div>
+
+            <div class="divider" style="margin: 0.75rem 0;"></div>
+
+            <div class="server-grid">
+                <div class="server-feature">
+                    <span class="server-feature-label">Logs:</span>
+                    <%- include('status-dot', { active: guild.config.logChannelId }) %>
+                </div>
+                <div class="server-feature">
+                    <span class="server-feature-label">Bienvenue:</span>
+                    <%- include('status-dot', { active: guild.config.welcomeChannelId }) %>
+                </div>
+                <div class="server-feature">
+                    <span class="server-feature-label">Auto-rôle:</span>
+                    <%- include('status-dot', { active: guild.config.autoRole }) %>
+                </div>
+                <div class="server-feature">
+                    <span class="server-feature-label">Tickets:</span>
+                    <%- include('status-dot', { active: guild.config.ticketCategoryId }) %>
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <a href="/dashboard/<%= guild.config.id %>" class="btn btn-ghost btn-sm btn-block">
+                    <img src="/assets/img/settings.svg" alt="" class="icon icon-sm icon-muted">
+                    Configurer
+                </a>
+            </div>
+        </div>

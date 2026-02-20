@@ -1,89 +1,77 @@
-<div class="animate-in">
-    <div class="settings-header">
-        <div class="settings-guild-icon">
-            <img src="/assets/img/castle.svg" alt="" class="icon icon-white">
-        </div>
-        <div>
-            <h1 style="margin-bottom: 0; font-size: 1.8rem;">
-                <%= guild.name %>
-            </h1>
-            <span class="badge badge-blurple" style="margin-top: 0.25rem;">ID: <%= guild.id %></span>
-        </div>
-    </div>
-</div>
+<%- include('partials/head') %>
+    <%- include('partials/header', { user }) %>
+        <main>
 
-<div class="divider"></div>
+            <%# ═══ PAGE: SETTINGS (Per-Guild Config) ═══ %>
 
-<!-- SETTINGS FORM -->
-<form action="/dashboard/<%= guild.id %>" method="POST">
-    <div class="grid grid-2">
+                <div class="animate-in">
+                    <div class="settings-header">
+                        <div class="settings-guild-icon">
+                            <% if (guild.icon) { %>
+                                <img src="<%= guild.icon %>" alt=""
+                                    style="width:100%;height:100%;border-radius:10px;object-fit:cover;">
+                                <% } else { %>
+                                    <img src="/assets/img/castle.svg" alt="" class="icon icon-white">
+                                    <% } %>
+                        </div>
+                        <div>
+                            <h1 style="margin-bottom: 0; font-size: 1.8rem;">
+                                <%= guild.name %>
+                            </h1>
+                            <span class="badge badge-blurple" style="margin-top: 0.25rem;">ID: <%= guild.id %></span>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- LOGS -->
-        <div class="card animate-in delay-1">
-            <h2>
-                <img src="/assets/img/radar.svg" alt="" class="icon icon-neon">
-                Canal de Logs
-            </h2>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="logChannelId">Channel ID</label>
-                <input type="text" id="logChannelId" name="logChannelId" class="form-input"
-                    value="<%= config.logChannelId || '' %>" placeholder="Ex: 1234567890123456789">
-                <div class="form-hint">ID du salon où envoyer les logs (messages supprimés, modifications, etc.)</div>
-            </div>
-        </div>
+                <div class="divider"></div>
 
-        <!-- WELCOME -->
-        <div class="card animate-in delay-2">
-            <h2>
-                <img src="/assets/img/welcome.svg" alt="" class="icon icon-neon">
-                Canal Bienvenue/Départ
-            </h2>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="welcomeChannelId">Channel ID</label>
-                <input type="text" id="welcomeChannelId" name="welcomeChannelId" class="form-input"
-                    value="<%= config.welcomeChannelId || '' %>" placeholder="Ex: 1234567890123456789">
-                <div class="form-hint">ID du salon pour les images de bienvenue et messages de départ</div>
-            </div>
-        </div>
+                <!-- SETTINGS FORM -->
+                <form id="settingsForm" action="/dashboard/<%= guild.id %>" method="POST"
+                    data-guild-id="<%= guild.id %>">
+                    <div class="grid grid-2">
+                        <%- include('partials/setting-field', { icon: 'radar' , label: 'Canal de Logs' ,
+                            name: 'logChannelId' , value: config.logChannelId || '' ,
+                            hint: 'Salon où envoyer les logs (messages supprimés, modifications, etc.)' , type: 'select'
+                            , options: textChannels }) %>
 
-        <!-- AUTO-ROLE -->
-        <div class="card animate-in delay-3">
-            <h2>
-                <img src="/assets/img/medal.svg" alt="" class="icon icon-neon">
-                Auto-Rôle
-            </h2>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="autoRole">Role ID</label>
-                <input type="text" id="autoRole" name="autoRole" class="form-input" value="<%= config.autoRole || '' %>"
-                    placeholder="Ex: 1234567890123456789">
-                <div class="form-hint">ID du rôle attribué automatiquement aux nouvelles recrues</div>
-            </div>
-        </div>
+                            <%- include('partials/setting-field', { icon: 'welcome' , label: 'Canal Bienvenue/Départ' ,
+                                name: 'welcomeChannelId' , value: config.welcomeChannelId || '' ,
+                                hint: 'Salon pour les images de bienvenue et messages de départ' , type: 'select' ,
+                                options: textChannels }) %>
 
-        <!-- TICKETS -->
-        <div class="card animate-in delay-4">
-            <h2>
-                <img src="/assets/img/ticket.svg" alt="" class="icon icon-neon">
-                Catégorie Tickets
-            </h2>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="ticketCategoryId">Category ID</label>
-                <input type="text" id="ticketCategoryId" name="ticketCategoryId" class="form-input"
-                    value="<%= config.ticketCategoryId || '' %>" placeholder="Ex: 1234567890123456789">
-                <div class="form-hint">ID de la catégorie où créer les tickets de support</div>
-            </div>
-        </div>
-    </div>
+                                <%- include('partials/setting-field', { icon: 'medal' , label: 'Auto-Rôle' ,
+                                    name: 'autoRole' , value: config.autoRole || '' ,
+                                    hint: 'Rôle attribué automatiquement aux nouvelles recrues' , type: 'select' ,
+                                    options: roles }) %>
 
-    <!-- ACTIONS -->
-    <div class="settings-actions animate-in delay-4">
-        <button type="submit" class="btn btn-neon btn-lg">
-            <img src="/assets/img/save.svg" alt="" class="icon">
-            Sauvegarder
-        </button>
-        <a href="/dashboard" class="btn btn-ghost">
-            <img src="/assets/img/arrow-left.svg" alt="" class="icon icon-sm icon-muted">
-            Retour
-        </a>
-    </div>
-</form>
+                                    <%- include('partials/setting-field', { icon: 'ticket' , label: 'Catégorie Tickets'
+                                        , name: 'ticketCategoryId' , value: config.ticketCategoryId || '' ,
+                                        hint: 'Catégorie où créer les tickets de support' , type: 'select' , options:
+                                        categories }) %>
+
+                                        <%- include('partials/setting-field', { icon: 'shield' , label: 'Anti-Spam' ,
+                                            name: 'antiSpam' , value: config.antiSpam || false,
+                                            hint: 'Détection et suppression automatique du spam' , type: 'toggle' ,
+                                            options: [] }) %>
+
+                                            <%- include('partials/setting-field', { icon: 'shield' , label: 'Anti-Lien'
+                                                , name: 'antiLink' , value: config.antiLink || false,
+                                                hint: 'Suppression automatique des liens non autorisés' , type: 'toggle'
+                                                , options: [] }) %>
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="settings-actions animate-in">
+                        <button type="submit" class="btn btn-neon btn-lg" id="saveBtn">
+                            <img src="/assets/img/save.svg" alt="" class="icon">
+                            Sauvegarder
+                        </button>
+                        <a href="/dashboard" class="btn btn-ghost">
+                            <img src="/assets/img/arrow-left.svg" alt="" class="icon icon-sm icon-muted">
+                            Retour
+                        </a>
+                    </div>
+                </form>
+
+        </main>
+        <%- include('partials/footer') %>

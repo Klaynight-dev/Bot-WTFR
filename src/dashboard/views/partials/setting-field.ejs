@@ -1,0 +1,39 @@
+<%# — Setting Field Component — %>
+    <%# Usage: include('partials/setting-field', { icon, label, name, value, hint, type, options }) %>
+        <%# type: 'text' | 'select' | 'toggle' %>
+            <div class="card animate-in">
+                <h2>
+                    <img src="/assets/img/<%= icon %>.svg" alt="" class="icon icon-neon">
+                    <%= label %>
+                </h2>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="<%= name %>">
+                        <%= label %>
+                    </label>
+
+                    <% if (type==='select' && options && options.length> 0) { %>
+                        <select id="<%= name %>" name="<%= name %>" class="form-input form-select">
+                            <option value="">— Aucun —</option>
+                            <% options.forEach(function(opt) { %>
+                                <option value="<%= opt.id %>" <%=opt.id===value ? 'selected' : '' %>>
+                                    <%= opt.name %>
+                                </option>
+                                <% }); %>
+                        </select>
+                        <% } else if (type==='toggle' ) { %>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="<%= name %>" name="<%= name %>" <%=value ? 'checked' : '' %>>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <% } else { %>
+                                <input type="text" id="<%= name %>" name="<%= name %>" class="form-input"
+                                    value="<%= value || '' %>" placeholder="Ex: 1234567890123456789">
+                                <% } %>
+
+                                    <% if (hint) { %>
+                                        <div class="form-hint">
+                                            <%= hint %>
+                                        </div>
+                                        <% } %>
+                </div>
+            </div>

@@ -1,94 +1,91 @@
-<% include head.ejs %>
-<% include header.ejs %>
-<!-- HERO SECTION -->
-<div class="hero animate-in">
-    <!-- Radar decorative element -->
-    <div class="hero-radar">
-        <div class="hero-radar-ring hero-radar-ring--outer"></div>
-        <div class="hero-radar-ring hero-radar-ring--mid"></div>
-        <div class="hero-radar-ring hero-radar-ring--inner"></div>
-        <div class="hero-crosshair-h"></div>
-        <div class="hero-crosshair-v"></div>
-        <div class="hero-center-icon">
-            <img src="/assets/img/swords.svg" alt="WTFR" class="icon-hero icon-neon glow">
-        </div>
-    </div>
+<%- include('partials/head') %>
+    <%- include('partials/header', { user }) %>
+        <main>
 
-    <h1 style="font-size: 3.2rem; margin-bottom: 0.3rem; line-height: 1.1;">WARBOT FR</h1>
-    <p class="subtitle" style="margin-bottom: 2.5rem;">Centre de Commandement</p>
+            <%# ═══ PAGE: INDEX / HOME ═══ %>
 
-    <div class="hero-actions">
-        <% if (!user) { %>
-            <a href="/auth/discord" class="btn btn-primary btn-lg">
-                <img src="/assets/img/discord.svg" alt="" class="icon icon-white">
-                Se connecter avec Discord
-            </a>
-            <% } else { %>
-                <a href="/dashboard" class="btn btn-neon btn-lg">
-                    <img src="/assets/img/arrow-right.svg" alt="" class="icon">
-                    Accéder au Dashboard
-                </a>
-                <% } %>
-    </div>
-</div>
+                <!-- HERO SECTION -->
+                <div class="hero animate-in">
+                    <div class="hero-radar">
+                        <div class="hero-radar-ring hero-radar-ring--outer"></div>
+                        <div class="hero-radar-ring hero-radar-ring--mid"></div>
+                        <div class="hero-radar-ring hero-radar-ring--inner"></div>
+                        <div class="hero-crosshair-h"></div>
+                        <div class="hero-crosshair-v"></div>
+                        <div class="hero-center-icon">
+                            <img src="/assets/img/swords.svg" alt="WTFR" class="icon-hero icon-neon glow">
+                        </div>
+                    </div>
 
-<div class="divider"></div>
+                    <h1>WARBOT FR</h1>
+                    <p class="subtitle">Centre de Commandement</p>
 
-<!-- FEATURES GRID -->
-<div class="grid grid-3" style="margin-top: 1.5rem;">
-    <div class="card feature-card animate-in delay-1">
-        <div class="feature-icon feature-icon--neon">
-            <img src="/assets/img/radar.svg" alt="" class="icon-lg icon-neon">
-        </div>
-        <h2>
-            <img src="/assets/img/radar.svg" alt="" class="icon icon-neon">
-            Logs & Intel
-        </h2>
-        <p>Surveillance en temps réel des messages supprimés, modifiés et des actions de modération.</p>
-    </div>
+                    <div class="hero-actions">
+                        <% if (!user) { %>
+                            <a href="/auth/discord" class="btn btn-primary btn-lg">
+                                <img src="/assets/img/discord.svg" alt="" class="icon icon-white">
+                                Se connecter avec Discord
+                            </a>
+                            <% } else { %>
+                                <a href="/dashboard" class="btn btn-neon btn-lg">
+                                    <img src="/assets/img/arrow-right.svg" alt="" class="icon">
+                                    Accéder au Dashboard
+                                </a>
+                                <% } %>
+                    </div>
+                </div>
 
-    <div class="card feature-card animate-in delay-2">
-        <div class="feature-icon feature-icon--blurple">
-            <img src="/assets/img/medal.svg" alt="" class="icon-lg icon-blurple">
-        </div>
-        <h2>
-            <img src="/assets/img/medal.svg" alt="" class="icon icon-blurple">
-            Auto-Rôles
-        </h2>
-        <p>Attribution automatique de rôles aux nouvelles recrues qui rejoignent le serveur.</p>
-    </div>
+                <div class="divider"></div>
 
-    <div class="card feature-card animate-in delay-3">
-        <div class="feature-icon feature-icon--amber">
-            <img src="/assets/img/ticket.svg" alt="" class="icon-lg icon-amber">
-        </div>
-        <h2>
-            <img src="/assets/img/ticket.svg" alt="" class="icon icon-amber">
-            Tickets
-        </h2>
-        <p>Système de tickets de support pour gérer les demandes et rapports des membres.</p>
-    </div>
-</div>
+                <!-- FEATURES GRID (using reusable partial) -->
+                <div class="grid grid-3">
+                    <%- include('partials/feature-card', { icon: 'radar' , color: 'neon' , delay: 1,
+                        title: 'Logs & Intel' ,
+                        desc: 'Surveillance en temps réel des messages supprimés, modifiés et des actions de modération.'
+                        }) %>
+                        <%- include('partials/feature-card', { icon: 'medal' , color: 'blurple' , delay: 2,
+                            title: 'Auto-Rôles' ,
+                            desc: 'Attribution automatique de rôles aux nouvelles recrues qui rejoignent le serveur.' })
+                            %>
+                            <%- include('partials/feature-card', { icon: 'ticket' , color: 'amber' , delay: 3,
+                                title: 'Tickets' ,
+                                desc: 'Système de tickets de support pour gérer les demandes et rapports des membres.'
+                                }) %>
+                </div>
 
-<!-- STATS BAR -->
-<div class="card animate-in delay-4" style="margin-top: 1.5rem;">
-    <div class="stats-bar">
-        <div class="stat-item">
-            <img src="/assets/img/clock.svg" alt="" class="stat-icon icon-neon">
-            <div class="stat-value stat-value--neon">24/7</div>
-            <div class="stat-label">Uptime</div>
-        </div>
-        <div class="stat-item">
-            <img src="/assets/img/shield.svg" alt="" class="stat-icon icon-blurple">
-            <div class="stat-value stat-value--blurple">v1.8</div>
-            <div class="stat-label">Version</div>
-        </div>
-        <div class="stat-item">
-            <img src="/assets/img/commands.svg" alt="" class="stat-icon icon-amber">
-            <div class="stat-value stat-value--amber">∞</div>
-            <div class="stat-label">Commandes</div>
-        </div>
-    </div>
-</div>
+                <!-- LIVE STATS BAR -->
+                <div class="card animate-in delay-4">
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <img src="/assets/img/clock.svg" alt="" class="stat-icon icon-neon">
+                            <div class="stat-value stat-value--neon" id="stat-uptime">
+                                <%= stats.uptime %>
+                            </div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                        <div class="stat-item">
+                            <img src="/assets/img/castle.svg" alt="" class="stat-icon icon-blurple">
+                            <div class="stat-value stat-value--blurple" id="stat-guilds">
+                                <%= stats.guilds %>
+                            </div>
+                            <div class="stat-label">Serveurs</div>
+                        </div>
+                        <div class="stat-item">
+                            <img src="/assets/img/shield.svg" alt="" class="stat-icon icon-amber">
+                            <div class="stat-value stat-value--amber" id="stat-members">
+                                <%= stats.members %>
+                            </div>
+                            <div class="stat-label">Membres</div>
+                        </div>
+                        <div class="stat-item">
+                            <img src="/assets/img/commands.svg" alt="" class="stat-icon icon-neon">
+                            <div class="stat-value stat-value--neon" id="stat-commands">
+                                <%= stats.commands %>
+                            </div>
+                            <div class="stat-label">Commandes</div>
+                        </div>
+                    </div>
+                </div>
 
-<% include footer.ejs %>
+        </main>
+        <%- include('partials/footer') %>

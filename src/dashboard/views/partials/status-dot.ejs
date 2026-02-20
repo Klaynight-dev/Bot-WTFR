@@ -1,0 +1,11 @@
+<%# — Status Dot Component — %>
+    <%# Usage: include('partials/status-dot', { active: someValue, activeLabel: 'Actif' , inactiveLabel: 'Inactif' }) %>
+        <% const isActive=!!active; %>
+            <% const labelOn=activeLabel || 'Actif' ; %>
+                <% const labelOff=inactiveLabel || 'Inactif' ; %>
+                    <span class="status-indicator">
+                        <span class="status-dot <%= isActive ? 'status-online' : 'status-offline' %>"></span>
+                        <span style="color: var(<%= isActive ? '--neon' : '--text-muted' %>);">
+                            <%= isActive ? labelOn : labelOff %>
+                        </span>
+                    </span>
