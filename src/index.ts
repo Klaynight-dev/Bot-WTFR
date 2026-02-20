@@ -10,6 +10,12 @@ import {
 
 import { updateGlobalMessage } from './functions/updateMessage'
 
+const clientId = (process.env.CLIENT_ID || '').trim()
+const clientSecret = (process.env.CLIENT_SECRET || '').trim()
+console.log(`[OAuth Diagnostic] CLIENT_ID: |${clientId.charAt(0)}...${clientId.slice(-1)}| (len: ${clientId.length})`)
+console.log(`[OAuth Diagnostic] CLIENT_SECRET: |${clientSecret.charAt(0)}...${clientSecret.slice(-1)}| (len: ${clientSecret.length})`)
+console.log(`[OAuth Diagnostic] CALLBACK_URL: ${process.env.CALLBACK_URL || 'http://localhost:3000/auth/discord/callback'}`)
+
 type ExtendedClient = Client & { commands: Collection<string, any> }
 const client = new Client({ intents: [GatewayIntentBits.Guilds] }) as ExtendedClient
 

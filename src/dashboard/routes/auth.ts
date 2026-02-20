@@ -33,6 +33,17 @@ router.get('/discord/callback', (req, res, next) => {
     })(req, res, next)
 })
 
+router.get('/diag', (req, res) => {
+    const clientId = (process.env.CLIENT_ID || '').trim()
+    const clientSecret = (process.env.CLIENT_SECRET || '').trim()
+    res.json({
+        clientId: `${clientId.charAt(0)}...${clientId.slice(-1)} (len: ${clientId.length})`,
+        clientSecret: `${clientSecret.charAt(0)}...${clientSecret.slice(-1)} (len: ${clientSecret.length})`,
+        callbackUrl: process.env.CALLBACK_URL,
+        node_env: process.env.NODE_ENV
+    })
+})
+
 router.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) return next(err)
