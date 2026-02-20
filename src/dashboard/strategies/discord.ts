@@ -11,8 +11,8 @@ passport.deserializeUser((obj: any, done) => {
 })
 
 passport.use(new DiscordStrategy({
-    clientID: process.env.DISCORD_CLIENT_ID!,
-    clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+    clientID: process.env.CLIENT_ID!,
+    clientSecret: process.env.CLIENT_SECRET!,
     callbackURL: process.env.CALLBACK_URL || 'http://localhost:3000/auth/discord/callback',
     scope: ['identify', 'guilds']
 }, (accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) => {

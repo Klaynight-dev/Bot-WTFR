@@ -48,6 +48,9 @@ importers:
         specifier: ^10.30.0
         version: 10.30.0
     devDependencies:
+      '@types/body-parser':
+        specifier: ^1.19.6
+        version: 1.19.6
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6
@@ -63,6 +66,12 @@ importers:
       '@types/passport-discord':
         specifier: ^0.1.15
         version: 0.1.15
+      '@types/passport-oauth2':
+        specifier: ^1.8.0
+        version: 1.8.0
+      '@types/serve-static':
+        specifier: ^2.2.0
+        version: 2.2.0
       prisma:
         specifier: ^7.4.1
         version: 7.4.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
