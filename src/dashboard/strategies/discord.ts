@@ -14,8 +14,9 @@ passport.use(new DiscordStrategy({
     clientID: process.env.CLIENT_ID!,
     clientSecret: process.env.CLIENT_SECRET!,
     callbackURL: process.env.CALLBACK_URL || 'http://localhost:3000/auth/discord/callback',
-    scope: ['identify', 'guilds']
-}, (accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) => {
+    scope: ['identify', 'guilds'],
+    proxy: true
+} as any, (accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) => {
     process.nextTick(() => {
         return done(null, profile)
     })

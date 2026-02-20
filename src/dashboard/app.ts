@@ -11,6 +11,8 @@ export function startDashboard(client: Client) {
     const app = express()
     const PORT = process.env.PORT || 3000
 
+    app.set('trust proxy', 1)
+
     // Session Setup
     app.use(session({
         secret: process.env.SESSION_SECRET || 'super_secret_key_change_me',
