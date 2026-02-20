@@ -1,12 +1,8 @@
 <div class="animate-in">
-    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.25rem;">
-        <div style="
-      width: 48px; height: 48px; border-radius: 12px;
-      background: linear-gradient(135deg, var(--blurple), #4752c4);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 15px var(--blurple-glow);
-    ">🏰</div>
+    <div class="settings-header">
+        <div class="settings-guild-icon">
+            <img src="/assets/img/castle.svg" alt="" class="icon icon-white">
+        </div>
         <div>
             <h1 style="margin-bottom: 0; font-size: 1.8rem;">
                 <%= guild.name %>
@@ -24,7 +20,10 @@
 
         <!-- LOGS -->
         <div class="card animate-in delay-1">
-            <h2>📡 Canal de Logs</h2>
+            <h2>
+                <img src="/assets/img/radar.svg" alt="" class="icon icon-neon">
+                Canal de Logs
+            </h2>
             <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" for="logChannelId">Channel ID</label>
                 <input type="text" id="logChannelId" name="logChannelId" class="form-input"
@@ -35,7 +34,10 @@
 
         <!-- WELCOME -->
         <div class="card animate-in delay-2">
-            <h2>👋 Canal Bienvenue/Départ</h2>
+            <h2>
+                <img src="/assets/img/welcome.svg" alt="" class="icon icon-neon">
+                Canal Bienvenue/Départ
+            </h2>
             <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" for="welcomeChannelId">Channel ID</label>
                 <input type="text" id="welcomeChannelId" name="welcomeChannelId" class="form-input"
@@ -46,7 +48,10 @@
 
         <!-- AUTO-ROLE -->
         <div class="card animate-in delay-3">
-            <h2>🎖 Auto-Rôle</h2>
+            <h2>
+                <img src="/assets/img/medal.svg" alt="" class="icon icon-neon">
+                Auto-Rôle
+            </h2>
             <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" for="autoRole">Role ID</label>
                 <input type="text" id="autoRole" name="autoRole" class="form-input" value="<%= config.autoRole || '' %>"
@@ -57,7 +62,10 @@
 
         <!-- TICKETS -->
         <div class="card animate-in delay-4">
-            <h2>🎫 Catégorie Tickets</h2>
+            <h2>
+                <img src="/assets/img/ticket.svg" alt="" class="icon icon-neon">
+                Catégorie Tickets
+            </h2>
             <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" for="ticketCategoryId">Category ID</label>
                 <input type="text" id="ticketCategoryId" name="ticketCategoryId" class="form-input"
@@ -68,12 +76,14 @@
     </div>
 
     <!-- ACTIONS -->
-    <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem;" class="animate-in delay-4">
+    <div class="settings-actions animate-in delay-4">
         <button type="submit" class="btn btn-neon btn-lg">
-            💾 Sauvegarder
+            <img src="/assets/img/save.svg" alt="" class="icon">
+            Sauvegarder
         </button>
         <a href="/dashboard" class="btn btn-ghost">
-            ← Retour
+            <img src="/assets/img/arrow-left.svg" alt="" class="icon icon-sm icon-muted">
+            Retour
         </a>
     </div>
 </form>

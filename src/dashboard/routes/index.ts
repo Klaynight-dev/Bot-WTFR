@@ -13,13 +13,23 @@ router.get('/', (req, res) => {
 })
 
 router.get('/dashboard', checkAuth, async (req: any, res) => {
-    const guildConfig = await prisma.guildConfig.findMany()
+    let guildConfig: any[] = []
+    try {
+        guildConfig = await prisma.guildConfig.findMany()
+    } catch (e) {
+        console.warn('[Dashboard] GuildConfig table not found, showing empty list')
+    }
     res.render('dashboard', { user: req.user, guildConfig })
 })
 
 router.get('/dashboard/:guildId', checkAuth, async (req: any, res) => {
     const { guildId } = req.params
-    const guildConfig = await prisma.guildConfig.findUnique({ where: { id: guildId } })
+    let guildConfig = null
+    try {
+        guildConfig = await prisma.guildConfig.findUnique({ where: { id: guildId } })
+    } catch (e) {
+        console.warn('[Dashboard] GuildConfig table not found')
+    }
     const guild = req.bot.guilds.cache.get(guildId)
 
     if (!guild) return res.send("Serveur introuvable ou le bot n'y est pas.")

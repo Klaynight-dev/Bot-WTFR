@@ -32,7 +32,8 @@ export function startDashboard(client: Client) {
     app.set('views', path.join(__dirname, 'views'))
 
     // Static Files
-    app.use(express.static(path.join(__dirname, '../../public'))) // Adjust path if needed
+    app.use(express.static(path.join(__dirname, '../../public')))
+    app.use('/assets', express.static(path.join(__dirname, '../../contents')))
 
     // Middleware to expose client to routes
     app.use((req, res, next) => {

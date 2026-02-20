@@ -1,0 +1,42 @@
+<header>
+    <a href="/" class="logo">
+        <div class="logo-icon">
+            <img src="/assets/img/swords.svg" alt="" class="icon">
+        </div>
+        WTFR
+        <span class="logo-tag">Command Center</span>
+    </a>
+
+    <div class="nav-right">
+        <% if (user) { %>
+            <nav class="nav-links">
+                <a href="/dashboard" class="nav-link">
+                    <img src="/assets/img/shield.svg" alt="" class="icon icon-sm icon-neon">
+                    Dashboard
+                </a>
+            </nav>
+            <div class="user-badge">
+                <div class="user-avatar">
+                    <% if (user.avatar) { %>
+                        <img src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png?size=64"
+                            alt="">
+                        <% } else { %>
+                            <%= user.username ? user.username.charAt(0).toUpperCase() : '?' %>
+                                <% } %>
+                </div>
+                <span class="user-name">
+                    <%= user.username %>
+                </span>
+            </div>
+            <a href="/auth/logout" class="btn btn-ghost btn-sm">
+                <img src="/assets/img/logout.svg" alt="" class="icon icon-sm icon-muted">
+                Déconnexion
+            </a>
+            <% } else { %>
+                <a href="/auth/discord" class="btn btn-primary btn-sm">
+                    <img src="/assets/img/discord.svg" alt="" class="icon icon-sm icon-white">
+                    Connexion
+                </a>
+                <% } %>
+    </div>
+</header>

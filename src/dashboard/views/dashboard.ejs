@@ -1,33 +1,30 @@
 <h1 class="animate-in">Tableau de Bord</h1>
-<p class="animate-in delay-1" style="margin-bottom: 2rem;">Bienvenue, <strong style="color: var(--neon);">
+<p class="animate-in delay-1" style="margin-bottom: 2rem;">
+    Bienvenue, <strong style="color: var(--neon);">
         <%= user.username %>
-    </strong> — voici vos zones d'opération.</p>
+    </strong> — voici vos zones d'opération.
+</p>
 
 <!-- SERVER LIST -->
 <div class="card animate-in delay-2">
-    <h2>🏰 Serveurs Configurés</h2>
+    <h2>
+        <img src="/assets/img/castle.svg" alt="" class="icon icon-neon">
+        Serveurs Configurés
+    </h2>
     <p style="margin-bottom: 1rem;">Configurations actives du bot sur vos serveurs.</p>
 
     <% if (guildConfig && guildConfig.length> 0) { %>
         <div class="grid grid-2">
             <% guildConfig.forEach(function(config) { %>
-                <div class="card" style="margin-bottom: 0;">
-                    <div
-                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                        <div style="display: flex; align-items: center; gap: 0.6rem;">
-                            <div style="
-                width: 40px; height: 40px; border-radius: 10px;
-                background: linear-gradient(135deg, var(--blurple), #4752c4);
-                display: flex; align-items: center; justify-content: center;
-                font-size: 1.1rem;
-              ">🏰</div>
+                <div class="card card-flat">
+                    <div class="server-header">
+                        <div class="server-info">
+                            <div class="server-icon">
+                                <img src="/assets/img/castle.svg" alt="" class="icon icon-white">
+                            </div>
                             <div>
-                                <div
-                                    style="font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 1rem; letter-spacing: 0.5px;">
-                                    Serveur
-                                </div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">
-                                    ID: <%= config.id %>
+                                <div class="server-name">Serveur</div>
+                                <div class="server-id">ID: <%= config.id %>
                                 </div>
                             </div>
                         </div>
@@ -36,9 +33,9 @@
 
                     <div class="divider" style="margin: 0.75rem 0;"></div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.82rem;">
-                        <div>
-                            <span style="color: var(--text-muted);">Logs:</span>
+                    <div class="server-grid">
+                        <div class="server-feature">
+                            <span class="server-feature-label">Logs:</span>
                             <% if (config.logChannelId) { %>
                                 <span class="status-dot status-online"></span>
                                 <span style="color: var(--neon);">Actif</span>
@@ -47,8 +44,8 @@
                                     <span style="color: var(--text-muted);">Inactif</span>
                                     <% } %>
                         </div>
-                        <div>
-                            <span style="color: var(--text-muted);">Bienvenue:</span>
+                        <div class="server-feature">
+                            <span class="server-feature-label">Bienvenue:</span>
                             <% if (config.welcomeChannelId) { %>
                                 <span class="status-dot status-online"></span>
                                 <span style="color: var(--neon);">Actif</span>
@@ -57,8 +54,8 @@
                                     <span style="color: var(--text-muted);">Inactif</span>
                                     <% } %>
                         </div>
-                        <div>
-                            <span style="color: var(--text-muted);">Auto-rôle:</span>
+                        <div class="server-feature">
+                            <span class="server-feature-label">Auto-rôle:</span>
                             <% if (config.autoRole) { %>
                                 <span class="status-dot status-online"></span>
                                 <span style="color: var(--neon);">Actif</span>
@@ -67,8 +64,8 @@
                                     <span style="color: var(--text-muted);">Inactif</span>
                                     <% } %>
                         </div>
-                        <div>
-                            <span style="color: var(--text-muted);">Tickets:</span>
+                        <div class="server-feature">
+                            <span class="server-feature-label">Tickets:</span>
                             <% if (config.ticketCategoryId) { %>
                                 <span class="status-dot status-online"></span>
                                 <span style="color: var(--neon);">Actif</span>
@@ -80,42 +77,35 @@
                     </div>
 
                     <div style="margin-top: 1rem;">
-                        <a href="/dashboard/<%= config.id %>" class="btn btn-ghost btn-sm"
-                            style="width: 100%; justify-content: center;">
-                            ⚙ Configurer
+                        <a href="/dashboard/<%= config.id %>" class="btn btn-ghost btn-sm btn-block">
+                            <img src="/assets/img/settings.svg" alt="" class="icon icon-sm icon-muted">
+                            Configurer
                         </a>
                     </div>
                 </div>
                 <% }); %>
         </div>
         <% } else { %>
-            <div style="text-align: center; padding: 2rem 1rem;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4;">📡</div>
-                <p
-                    style="font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase;">
-                    Aucune intel disponible
-                </p>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
-                    Aucune configuration de serveur trouvée dans la base de données.
-                </p>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <img src="/assets/img/radar.svg" alt="" class="icon-xl icon-muted">
+                </div>
+                <p class="empty-state-title">Aucune intel disponible</p>
+                <p class="empty-state-desc">Aucune configuration de serveur trouvée dans la base de données.</p>
             </div>
             <% } %>
 </div>
 
 <!-- STATS SECTION -->
 <div class="card animate-in delay-3">
-    <h2>📊 Statistiques</h2>
+    <h2>
+        <img src="/assets/img/chart.svg" alt="" class="icon icon-neon">
+        Statistiques
+    </h2>
     <div style="text-align: center; padding: 1.5rem;">
-        <div style="
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.5rem 1.2rem; border-radius: 8px;
-      background: var(--amber-glow); border: 1px solid rgba(240,160,48,0.2);
-      color: var(--amber);
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.9rem; font-weight: 600;
-      letter-spacing: 1px; text-transform: uppercase;
-    ">
-            ⏳ En cours de développement
+        <div class="dev-badge">
+            <img src="/assets/img/hourglass.svg" alt="" class="icon icon-sm icon-amber">
+            En cours de développement
         </div>
         <p style="margin-top: 0.75rem; font-size: 0.85rem;">
             Les statistiques détaillées arriveront prochainement.
