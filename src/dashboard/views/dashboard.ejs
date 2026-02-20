@@ -85,7 +85,7 @@
                                                         class="form-input form-select multi-select" multiple>
                                                         <% roles.forEach(role=> { %>
                                                             <option value="<%= role.id %>"
-                                                                style="color: <%= role.color %>" <%=(config.staffRoles
+                                                                <%- role.color ? 'style="color:' + role.color + '"' : '' %> <%=(config.staffRoles
                                                                 || []).includes(role.id) ? 'selected' : '' %>><%=
                                                                     role.name %>
                                                             </option>
@@ -100,7 +100,7 @@
                                                         class="form-input form-select multi-select" multiple>
                                                         <% roles.forEach(role=> { %>
                                                             <option value="<%= role.id %>"
-                                                                style="color: <%= role.color %>" <%=(config.panelRoles
+                                                                <%- role.color ? 'style="color:' + role.color + '"' : '' %> <%=(config.panelRoles
                                                                 || []).includes(role.id) ? 'selected' : '' %>><%=
                                                                     role.name %>
                                                             </option>

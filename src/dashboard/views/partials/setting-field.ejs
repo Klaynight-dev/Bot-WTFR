@@ -3,8 +3,10 @@
         <%# type: 'text' | 'select' | 'toggle' %>
             <div class="card animate-in">
                 <h2>
-                    <img src="/assets/img/<%= icon %>.svg" alt="" class="icon icon-neon">
-                    <%= label %>
+                    <% if (typeof icon !=='undefined' && icon) { %>
+                        <img src="/assets/img/<%= icon %>.svg" alt="" class="icon icon-neon">
+                        <% } %>
+                            <%= label %>
                 </h2>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label" for="<%= name %>">
