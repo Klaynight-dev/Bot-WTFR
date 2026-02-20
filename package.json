@@ -1,6 +1,6 @@
 {
   "name": "wtfr-bot",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "description": "Bot pseudo WTFR",
   "main": "dist/index.js",
   "scripts": {
@@ -8,10 +8,10 @@
     "start": "node dist/index.js",
     "dev": "npm run deploy:guild && ts-node-dev --respawn --transpile-only src/index.ts",
     "deploy-only": "node dist/deploy-commands.js",
-    "deploy": "pnpm run build && npm run deploy-only --",
-    "deploy:guild": "pnpm run build && npm run deploy-only -- --scope=guild",
-    "deploy:global": "pnpm run build && npm run deploy-only -- --scope=global",
-    "go": "npm run deploy:guild && pnpm run start",
+    "deploy": "npm run build && npm run deploy-only --",
+    "deploy:guild": "npm run build && npm run deploy-only -- --scope=guild",
+    "deploy:global": "npm run build && npm run deploy-only -- --scope=global",
+    "go": "npm run deploy:guild && npm run start",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
