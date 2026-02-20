@@ -1,21 +1,22 @@
 {
   "name": "wtfr-bot",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Bot pseudo WTFR",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "npm run clean-commands && npm run deploy:guild && ts-node-dev --respawn --transpile-only src/index.ts",
     "deploy": "pnpm run build && node dist/deploy-commands.js",
     "deploy:guild": "DEPLOY_SCOPE=guild pnpm run deploy",
     "deploy:global": "DEPLOY_SCOPE=global pnpm run deploy",
-    "go": "pnpm run build && pnpm run start",
+    "go": "npm run clean-commands && npm run deploy:guild && pnpm run start",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:dbpush": "prisma db push",
-    "bump-version": "ts-node scripts/bumpVersion.ts"
+    "bump-version": "ts-node scripts/bumpVersion.ts",
+    "clean-commands": "ts-node scripts/clearCommands.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.1",
