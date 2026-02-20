@@ -1,6 +1,6 @@
 {
   "name": "wtfr-bot",
-  "version": "1.7.10",
+  "version": "1.7.11",
   "description": "Bot pseudo WTFR",
   "main": "dist/index.js",
   "scripts": {
@@ -56,5 +56,12 @@
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "canvas",
+      "prisma",
+      "@prisma/engines"
+    ]
   }
 }

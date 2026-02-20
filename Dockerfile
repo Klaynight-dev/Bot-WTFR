@@ -12,7 +12,8 @@ COPY src ./src
 COPY scripts ./scripts
 COPY prisma.config.ts ./
 
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm config set only-built-dependencies canvas prisma @prisma/engines \
+    && pnpm install --no-frozen-lockfile
 
 RUN npx prisma generate
 
@@ -33,9 +34,10 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma
 
-RUN pnpm install --no-frozen-lockfile --prod=false \
+RUN pnpm config set only-built-dependencies canvas prisma @prisma/engines \
+    && pnpm install --no-frozen-lockfile --prod=false \
     && npx prisma generate \
-    && pnpm prune --prod
+    && pnpm prune --prod --no-scripts
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/scripts ./scripts
