@@ -7,7 +7,6 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml tsconfig.json ./
-# Copy scripts folder as well
 COPY scripts ./scripts
 COPY prisma ./prisma
 COPY prisma.config.ts ./
