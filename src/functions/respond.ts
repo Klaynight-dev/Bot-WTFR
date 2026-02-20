@@ -97,13 +97,6 @@ export async function sendPublicOrSecret(interaction: ChatInputCommandInteractio
       }
     }
 
-    const confirm = { content: '✅ Message public envoyé.', flags: 64 }
-    if (!interaction.deferred && !interaction.replied) {
-      await interaction.reply(confirm)
-    } else {
-      await interaction.followUp(confirm)
-    }
-    return
   }
 
   return _maybeAttachAndReply(interaction, { embeds: [embed], flags: 64 })

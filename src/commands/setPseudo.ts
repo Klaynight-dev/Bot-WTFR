@@ -28,7 +28,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     })
   } catch (err) {
     console.error('prisma upsert pseudo failed:', err)
-    try { await replyEmbed(interaction, createErrorEmbed("Erreur lors de l'enregistrement."), false) } catch (_) { }
+    try { await replyEmbed(interaction, createErrorEmbed("Erreur lors de l'enregistrement."), true) } catch (_) { }
     return
   }
 
@@ -43,7 +43,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   })
 
   try {
-    await replyEmbed(interaction, embed, false)
+    await replyEmbed(interaction, embed, true)
   } catch (err) {
     console.error('interaction reply failed:', err)
   }

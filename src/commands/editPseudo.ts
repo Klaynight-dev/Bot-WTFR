@@ -20,7 +20,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   if (!existing) {
     try {
-      return await replyEmbed(interaction, createErrorEmbed("Tu n’as pas enregistré de pseudo."), false)
+      return await replyEmbed(interaction, createErrorEmbed("Tu n’as pas enregistré de pseudo."), true)
     } catch (err) {
       console.error('interaction reply failed:', err)
       return
@@ -40,7 +40,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   })
 
   try {
-    await replyEmbed(interaction, embed, false)
+    await replyEmbed(interaction, embed, true)
   } catch (err) {
     console.error('interaction reply failed:', err)
   }
