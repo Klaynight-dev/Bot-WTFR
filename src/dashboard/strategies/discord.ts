@@ -10,9 +10,16 @@ passport.deserializeUser((obj: any, done) => {
     done(null, obj)
 })
 
+const clientId = process.env.CLIENT_ID || ''
+const clientSecret = process.env.CLIENT_SECRET || ''
+
+console.log(`[OAuth Diagnostic] CLIENT_ID: ${clientId.charAt(0)}...${clientId.slice(-1)} (length: ${clientId.length})`)
+console.log(`[OAuth Diagnostic] CLIENT_SECRET: ${clientSecret.charAt(0)}...${clientSecret.slice(-1)} (length: ${clientSecret.length})`)
+console.log(`[OAuth Diagnostic] CALLBACK_URL: ${process.env.CALLBACK_URL || 'http://localhost:3000/auth/discord/callback'}`)
+
 passport.use(new DiscordStrategy({
-    clientID: process.env.CLIENT_ID!,
-    clientSecret: process.env.CLIENT_SECRET!,
+    clientID: clientId,
+    clientSecret: clientSecret,
     callbackURL: process.env.CALLBACK_URL || 'http://localhost:3000/auth/discord/callback',
     scope: ['identify', 'guilds'],
     proxy: true
