@@ -17,10 +17,10 @@ export function buildPseudosPage(pseudos: any[] = [], page = 0, perPage = 5, foo
   // Use fields for improved readability (one pseudo per field)
   const fields = items.length
     ? items.map(u => ({
-        name: `\u200B`,
-        value: `**<@${u.id}> — \`${u.display}\`**\nRoblox: [${u.roblox}](https://www.roblox.com/users/profile?username=${encodeURIComponent(u.roblox)})`,
-        inline: false
-      }))
+      name: `\u200B`,
+      value: `**<@${u.id}> — \`${u.display}\`**\nRoblox: [${u.roblox}](https://www.roblox.com/users/profile?username=${encodeURIComponent(u.roblox)})`,
+      inline: false
+    }))
     : [{ name: '\u200B', value: '_Aucun pseudo enregistré._', inline: false }]
 
   const embed = makeEmbed({
@@ -88,7 +88,7 @@ export async function updateGlobalMessage(client: Client, createIfMissing = fals
               console.log(`[updateGlobalMessage] editing message ${messageId} in channel ${(ch as any).id}`)
               const branding = getBrandingAttachment()
               const needsAttachment = Boolean(payload.embeds?.[0]?.data?.footer?.icon_url?.startsWith?.('attachment://'))
-                if (branding && needsAttachment && !(msg.attachments && Array.from(msg.attachments.values()).some((a: any) => a.name === branding.name))) {
+              if (branding && needsAttachment && !(msg.attachments && Array.from(msg.attachments.values()).some((a: any) => a.name === branding.name))) {
                 await msg.edit({ embeds: payload.embeds, components: payload.components, files: [{ attachment: branding.path, name: branding.name }] })
               } else {
                 await msg.edit({ embeds: payload.embeds, components: payload.components })
@@ -106,30 +106,6 @@ export async function updateGlobalMessage(client: Client, createIfMissing = fals
         }
       }
 
-      for (const channel of client.channels.cache.values()) {
-        if (typeof (channel as any).messages?.fetch !== 'function') continue
-        try {
-          const msg = await (channel as any).messages.fetch(messageId).catch(() => null)
-          if (msg) {
-            console.log(`[updateGlobalMessage] found message ${messageId} in channel ${(channel as any).id} — editing`)
-            const branding = getBrandingAttachment()
-            const needsAttachment = Boolean(payload.embeds?.[0]?.data?.footer?.icon_url?.startsWith?.('attachment://'))
-              if (branding && needsAttachment && !(msg.attachments && Array.from(msg.attachments.values()).some((a: any) => a.name === branding.name))) {
-              await msg.edit({ embeds: payload.embeds, components: payload.components, files: [{ attachment: branding.path, name: branding.name }] })
-            } else {
-              await msg.edit({ embeds: payload.embeds, components: payload.components })
-            }
-            if (msgRow?.id) {
-              await prisma.messageState.update({ where: { id: msgRow.id }, data: { channelId: (channel as any).id, page: payload.page } })
-            } else {
-              await prisma.messageState.create({ data: { messageId: msg.id, channelId: (channel as any).id, page: payload.page } })
-            }
-            return
-          }
-        } catch (err) {
-          // ignore
-        }
-      }
     }
 
     // créer un nouveau message si nécessaire (création contrôlée par createIfMissing)

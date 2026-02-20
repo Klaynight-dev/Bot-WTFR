@@ -46,7 +46,7 @@ if (fs.existsSync(eventsPath)) {
 
 import { startDashboard } from './dashboard/app'
 
-client.once('clientReady', async () => {
+client.once('ready', async () => {
   console.log(`✅ Connecté en tant que ${client.user?.tag}`)
 
   // Start Dashboard
