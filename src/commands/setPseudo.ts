@@ -17,6 +17,12 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction, client: Client) {
   const affichage = interaction.options.getString('affichage') as string
   const roblox = interaction.options.getString('roblox') as string
+
+  const mentionRegex = /<@!?\d+>/
+  if (mentionRegex.test(affichage) || mentionRegex.test(roblox)) {
+    return await replyEmbed(interaction, createErrorEmbed("Les pseudos ne peuvent pas contenir de mentions Discord."), true)
+  }
+
   const user = interaction.user
   console.log(`[cmd:setpseudo] /setpseudo by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} affichage=${affichage} roblox=${roblox}`)
 
