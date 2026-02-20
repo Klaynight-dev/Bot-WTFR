@@ -13,9 +13,17 @@ passport.deserializeUser((obj: any, done) => {
 const clientId = (process.env.CLIENT_ID || '').trim()
 const clientSecret = (process.env.CLIENT_SECRET || '').trim()
 
+if (!clientId || !clientSecret) {
+    console.error('⚠️ [OAuth] CRITICAL: CLIENT_ID or CLIENT_SECRET is empty!')
+    console.error(`  CLIENT_ID length: ${clientId.length}`)
+    console.error(`  CLIENT_SECRET length: ${clientSecret.length}`)
+    console.error('  OAuth login will NOT work. Check your environment variables.')
+    console.error('  If using Docker, make sure to pass -e CLIENT_SECRET=... or use env_file.')
+}
+
 passport.use(new DiscordStrategy({
-    clientID: clientId,
-    clientSecret: clientSecret,
+    clientID: clientId || 'MISSING',
+    clientSecret: clientSecret || 'MISSING',
     callbackURL: process.env.CALLBACK_URL || 'http://localhost:3000/auth/discord/callback',
     scope: ['identify', 'guilds'],
     proxy: true
@@ -24,3 +32,4 @@ passport.use(new DiscordStrategy({
         return done(null, profile)
     })
 }))
+

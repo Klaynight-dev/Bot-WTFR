@@ -1,39 +1,79 @@
-<h1>Configuration du serveur : <%= guild.name %>
-</h1>
-
-<div class="card">
-    <form action="/dashboard/<%= guild.id %>" method="POST">
-        <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Canal de Logs (ID)</label>
-            <input type="text" name="logChannelId" value="<%= config.logChannelId || '' %>"
-                style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-            <small style="color: #aaa;">ID du salon où envoyer les logs (messages supprimés, etc.)</small>
+<div class="animate-in">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.25rem;">
+        <div style="
+      width: 48px; height: 48px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--blurple), #4752c4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 15px var(--blurple-glow);
+    ">🏰</div>
+        <div>
+            <h1 style="margin-bottom: 0; font-size: 1.8rem;">
+                <%= guild.name %>
+            </h1>
+            <span class="badge badge-blurple" style="margin-top: 0.25rem;">ID: <%= guild.id %></span>
         </div>
-
-        <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Canal de Bienvenue/Départ
-                (ID)</label>
-            <input type="text" name="welcomeChannelId" value="<%= config.welcomeChannelId || '' %>"
-                style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-            <small style="color: #aaa;">ID du salon où envoyer les images de bienvenue et messages de départ</small>
-        </div>
-
-        <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Auto-Rôle (ID)</label>
-            <input type="text" name="autoRole" value="<%= config.autoRole || '' %>"
-                style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-            <small style="color: #aaa;">ID du rôle à donner automatiquement aux nouveaux membres</small>
-        </div>
-
-        <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Catégorie Tickets (ID)</label>
-            <input type="text" name="ticketCategoryId" value="<%= config.ticketCategoryId || '' %>"
-                style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-            <small style="color: #aaa;">ID de la catégorie où créer les tickets</small>
-        </div>
-
-        <button type="submit" class="btn">Sauvegarder</button>
-    </form>
+    </div>
 </div>
 
-<a href="/dashboard" class="btn btn-secondary">Retour</a>
+<div class="divider"></div>
+
+<!-- SETTINGS FORM -->
+<form action="/dashboard/<%= guild.id %>" method="POST">
+    <div class="grid grid-2">
+
+        <!-- LOGS -->
+        <div class="card animate-in delay-1">
+            <h2>📡 Canal de Logs</h2>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="logChannelId">Channel ID</label>
+                <input type="text" id="logChannelId" name="logChannelId" class="form-input"
+                    value="<%= config.logChannelId || '' %>" placeholder="Ex: 1234567890123456789">
+                <div class="form-hint">ID du salon où envoyer les logs (messages supprimés, modifications, etc.)</div>
+            </div>
+        </div>
+
+        <!-- WELCOME -->
+        <div class="card animate-in delay-2">
+            <h2>👋 Canal Bienvenue/Départ</h2>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="welcomeChannelId">Channel ID</label>
+                <input type="text" id="welcomeChannelId" name="welcomeChannelId" class="form-input"
+                    value="<%= config.welcomeChannelId || '' %>" placeholder="Ex: 1234567890123456789">
+                <div class="form-hint">ID du salon pour les images de bienvenue et messages de départ</div>
+            </div>
+        </div>
+
+        <!-- AUTO-ROLE -->
+        <div class="card animate-in delay-3">
+            <h2>🎖 Auto-Rôle</h2>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="autoRole">Role ID</label>
+                <input type="text" id="autoRole" name="autoRole" class="form-input" value="<%= config.autoRole || '' %>"
+                    placeholder="Ex: 1234567890123456789">
+                <div class="form-hint">ID du rôle attribué automatiquement aux nouvelles recrues</div>
+            </div>
+        </div>
+
+        <!-- TICKETS -->
+        <div class="card animate-in delay-4">
+            <h2>🎫 Catégorie Tickets</h2>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="ticketCategoryId">Category ID</label>
+                <input type="text" id="ticketCategoryId" name="ticketCategoryId" class="form-input"
+                    value="<%= config.ticketCategoryId || '' %>" placeholder="Ex: 1234567890123456789">
+                <div class="form-hint">ID de la catégorie où créer les tickets de support</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem;" class="animate-in delay-4">
+        <button type="submit" class="btn btn-neon btn-lg">
+            💾 Sauvegarder
+        </button>
+        <a href="/dashboard" class="btn btn-ghost">
+            ← Retour
+        </a>
+    </div>
+</form>
