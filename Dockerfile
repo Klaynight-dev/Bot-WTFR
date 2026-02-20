@@ -43,6 +43,7 @@ RUN pnpm config set only-built-dependencies canvas prisma @prisma/engines \
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/scripts ./scripts
+COPY contents ./contents
 
 USER node
 
