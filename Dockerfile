@@ -14,6 +14,8 @@ COPY src ./src
 
 RUN pnpm install --no-frozen-lockfile
 
+RUN pnpm rebuild canvas
+
 RUN pnpm run build
 
 FROM node:20-alpine AS runner
