@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
 import prisma from '../prisma'
-import { makeEmbed, sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond'
+import { sendPublicOrSecret } from '../functions/respond'
+import { createEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('warn')
@@ -17,14 +18,15 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   console.log(`[cmd:warn] /warn by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} reason=${reason} secret=${secret}`)
   await prisma.warning.create({ data: { userId: user.id, moderatorId: interaction.user.id, reason } })
 
-  const embed = makeEmbed({
-    title: 'Avertissement',
+  const embed = createEmbed({
+    title: `${Emojis.Warning} Avertissement`,
     description: `<@${user.id}> a reçu un avertissement.`,
-    color: 0xFFA500,
+    color: Colors.Warning,
     fields: [
       { name: 'Raison', value: reason || 'Aucune raison fournie' },
       { name: 'Modérateur', value: `<@${interaction.user.id}>` }
-    ]
+    ],
+    footer: 'Sanction'
   })
 
   await sendPublicOrSecret(interaction, embed, secret)

@@ -1,7 +1,8 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, Client, MessageFlags } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
-import { makeEmbed, replyEmbed } from '../functions/respond' 
+import { replyEmbed } from '../functions/respond'
+import { createSuccessEmbed } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('reload-commands')
@@ -27,7 +28,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     const fp = path.join(commandsDir, file)
     try {
       delete require.cache[require.resolve(fp)]
-    } catch (err) {}
+    } catch (err) { }
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const command = require(fp)
@@ -37,5 +38,5 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     }
   }
 
-  await replyEmbed(interaction, makeEmbed({ title: 'Reload commands', description: `✅ ${client.commands.size} commandes rechargées.`, type: 'success' }))
+  await replyEmbed(interaction, createSuccessEmbed(`${client.commands.size} commandes rechargées.`))
 }

@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
-import { makeEmbed, sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond'
+import { sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond'
+import { createEmbed, createErrorEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('kick')
@@ -15,17 +16,28 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   console.log(`[cmd:kick] /kick by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} reason=${reason}`)
 
   const secret = interaction.options.getBoolean('secret') ?? false
-  if (!interaction.guild) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Commande utilisable uniquement en serveur.', color: 0xFF0000 }))
+  if (!interaction.guild) return replyEphemeralEmbed(interaction, createErrorEmbed('Commande utilisable uniquement en serveur.'))
 
   const member = await interaction.guild.members.fetch(user.id).catch(() => null)
-  if (!member) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Membre introuvable.', color: 0xFF0000 }))
+  if (!member) return replyEphemeralEmbed(interaction, createErrorEmbed('Membre introuvable.'))
 
   try {
     await member.kick(reason)
-    const embed = makeEmbed({ title: 'Expulsion', description: `<@${user.id}> expulsé.`, color: 0xFF4400, fields: [{ name: 'Raison', value: reason }, { name: 'Modérateur', value: `<@${interaction.user.id}>` }] })
+
+    const embed = createEmbed({
+      title: `${Emojis.Warning} Expulsion`, // Orange for kick
+      description: `<@${user.id}> a été expulsé.`,
+      color: Colors.Warning,
+      fields: [
+        { name: 'Raison', value: reason },
+        { name: 'Modérateur', value: `<@${interaction.user.id}>` }
+      ],
+      footer: 'Sanction'
+    })
+
     await sendPublicOrSecret(interaction, embed, secret)
   } catch (err) {
     console.error(err)
-    return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: `Impossible d'expulser ce membre.`, color: 0xFF0000 }))
+    return replyEphemeralEmbed(interaction, createErrorEmbed('Impossible d\'expulser ce membre (permissions insuffisantes ou rôle le plus élevé).'))
   }
 }

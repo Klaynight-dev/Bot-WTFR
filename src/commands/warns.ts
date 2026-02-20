@@ -1,6 +1,7 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
 import prisma from '../prisma'
-import { makeEmbed, replyEmbed } from '../functions/respond' 
+import { replyEmbed } from '../functions/respond'
+import { createEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('warns')
@@ -13,12 +14,17 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   console.log(`[cmd:warns] /warns by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id}`)
   const userWarnings = await prisma.warning.findMany({ where: { userId: user.id }, orderBy: { date: 'desc' } })
 
-  if (userWarnings.length === 0) return replyEmbed(interaction, makeEmbed({ title: 'Avertissements', description: 'Aucun avertissement pour cet utilisateur.', type: 'warn' }))
+  if (userWarnings.length === 0) return replyEmbed(interaction, createEmbed({
+    title: 'Avertissements',
+    description: 'Aucun avertissement pour cet utilisateur.',
+    color: Colors.Success // Green because it's good to have no warns
+  }))
 
-  const embed = makeEmbed({
-    title: `Avertissements — ${user.tag}`,
+  const embed = createEmbed({
+    title: `${Emojis.Info} Avertissements — ${user.tag}`,
     description: userWarnings.map((w: any, i: number) => `**${i + 1}.** ${w.reason} — <@${w.moderatorId}> (${new Date(w.date).toLocaleString()})`).join('\n'),
-    color: 0xFFA500
+    color: Colors.Warning,
+    footer: `${userWarnings.length} avertissement(s)`
   })
 
   await replyEmbed(interaction, embed)

@@ -1,7 +1,8 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
 import prisma from '../prisma'
 import { updateGlobalMessage } from '../functions/updateMessage'
-import { makeEmbed, replyEmbed } from '../functions/respond'
+import { replyEmbed } from '../functions/respond'
+import { createEmbed, createErrorEmbed, createSuccessEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('editpseudo')
@@ -19,7 +20,7 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   if (!existing) {
     try {
-      return await replyEmbed(interaction, makeEmbed({ title: 'Erreur', description: "Tu n’as pas enregistré de pseudo.", type: 'error' }), false)
+      return await replyEmbed(interaction, createErrorEmbed("Tu n’as pas enregistré de pseudo."), false)
     } catch (err) {
       console.error('interaction reply failed:', err)
       return
@@ -28,7 +29,16 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   await prisma.pseudo.update({ where: { id: user.id }, data: { display: affichage, roblox } })
 
-  const embed = makeEmbed({ title: 'Pseudos modifiés', description: `Tes pseudos ont été mis à jour.`, color: 0x00AA00, fields: [{ name: 'Affichage', value: affichage }, { name: 'Roblox', value: roblox }] })
+  const embed = createEmbed({
+    title: `${Emojis.Success} Pseudos modifiés`,
+    description: `Tes pseudos ont été mis à jour.`,
+    color: Colors.Success,
+    fields: [
+      { name: 'Affichage', value: affichage, inline: true },
+      { name: 'Roblox', value: roblox, inline: true }
+    ]
+  })
+
   try {
     await replyEmbed(interaction, embed, false)
   } catch (err) {

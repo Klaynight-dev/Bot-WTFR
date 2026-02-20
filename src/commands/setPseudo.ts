@@ -1,7 +1,8 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
 import prisma from '../prisma'
 import { updateGlobalMessage } from '../functions/updateMessage'
-import { makeEmbed, replyEmbed } from '../functions/respond' 
+import { replyEmbed } from '../functions/respond'
+import { createEmbed, createErrorEmbed, createSuccessEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('setpseudo')
@@ -27,11 +28,20 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     })
   } catch (err) {
     console.error('prisma upsert pseudo failed:', err)
-    try { await replyEmbed(interaction, makeEmbed({ title: 'Erreur', description: "Erreur lors de l'enregistrement.", type: 'error' }), false) } catch (_) {}
+    try { await replyEmbed(interaction, createErrorEmbed("Erreur lors de l'enregistrement."), false) } catch (_) { }
     return
   }
 
-  const embed = makeEmbed({ title: 'Pseudo enregistré', description: `Ton pseudo WTFR a bien été enregistré.`, color: 0x00AA00, fields: [{ name: 'Affichage', value: affichage }, { name: 'Roblox', value: roblox }] })
+  const embed = createEmbed({
+    title: `${Emojis.Success} Pseudo enregistré`,
+    description: `Ton pseudo WTFR a bien été enregistré.`,
+    color: Colors.Success,
+    fields: [
+      { name: 'Affichage', value: affichage, inline: true },
+      { name: 'Roblox', value: roblox, inline: true }
+    ]
+  })
+
   try {
     await replyEmbed(interaction, embed, false)
   } catch (err) {

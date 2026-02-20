@@ -22,9 +22,29 @@ model Warning {
   date        DateTime @default(now())
 }
 
+
 model MessageState {
   id        Int     @id @default(autoincrement())
   channelId String?
   messageId String?
   page      Int?
+}
+
+model GuildConfig {
+  id             String   @id // Guild ID
+  logChannelId   String?
+  welcomeChannelId String?
+  ticketCategoryId String?
+  autoRole       String?
+  antiSpam       Boolean  @default(false)
+  antiLink       Boolean  @default(false)
+  updatedAt      DateTime @updatedAt
+}
+
+model Ticket {
+  id        Int      @id @default(autoincrement())
+  channelId String   @unique // Ticket Channel ID
+  userId    String   // User who opened ticket
+  closed    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

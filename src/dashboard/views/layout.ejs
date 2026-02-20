@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WarBot FR Dashboard</title>
+  <style>
+    :root {
+      --primary: #5865F2;
+      --bg: #2F3136;
+      --bg-dark: #202225;
+      --text: #ffffff;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background-color: var(--bg-dark);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+    .user-info { display: flex; align-items: center; gap: 1rem; }
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      color: white;
+      background-color: var(--primary);
+      transition: background 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-secondary { background-color: #4f545c; }
+    main { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+    .card {
+      background-color: var(--bg-dark);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    h1, h2 { color: var(--primary); }
+    footer { text-align: center; padding: 1rem; background-color: var(--bg-dark); color: #72767d; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">WTFR Bot</a>
+    <div class="user-info">
+      <% if (user) { %>
+        <span><%= user.username %></span>
+        <a href="/auth/logout" class="btn btn-secondary">Déconnexion</a>
+      <% } else { %>
+        <a href="/auth/discord" class="btn">Connexion</a>
+      <% } %>
+    </div>
+  </header>
+  <main>
+    <%- body %>
+  </main>
+  <footer>
+    &copy; 2024 WarBot FR
+  </footer>
+</body>
+</html>

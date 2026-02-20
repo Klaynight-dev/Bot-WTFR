@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
-import { makeEmbed, sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond'
+import { sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond'
+import { createEmbed, createErrorEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('unmute')
@@ -13,17 +14,22 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const secret = interaction.options.getBoolean('secret') ?? false
   console.log(`[cmd:unmute] /unmute by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} secret=${secret}`)
 
-  if (!interaction.guild) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Commande utilisable uniquement en serveur.', color: 0xFF0000 }))
+  if (!interaction.guild) return replyEphemeralEmbed(interaction, createErrorEmbed('Commande utilisable uniquement en serveur.'))
 
   const member = await interaction.guild.members.fetch(user.id).catch(() => null)
-  if (!member) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Membre introuvable.', color: 0xFF0000 }))
+  if (!member) return replyEphemeralEmbed(interaction, createErrorEmbed('Membre introuvable.'))
 
   try {
-    await (member as any).timeout(null)
-    const embed = makeEmbed({ title: 'Timeout retiré', description: `<@${user.id}> n'est plus en timeout.`, color: 0x00AA00, fields: [{ name: 'Modérateur', value: `<@${interaction.user.id}>` }] })
+    await member.timeout(null)
+    const embed = createEmbed({
+      title: `${Emojis.Success} Timeout retiré`,
+      description: `<@${user.id}> n'est plus en timeout.`,
+      color: Colors.Success,
+      fields: [{ name: 'Modérateur', value: `<@${interaction.user.id}>` }]
+    })
     await sendPublicOrSecret(interaction, embed, secret)
   } catch (err) {
     console.error(err)
-    return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Impossible de retirer le timeout.', color: 0xFF0000 }))
+    return replyEphemeralEmbed(interaction, createErrorEmbed('Impossible de retirer le timeout.'))
   }
 }

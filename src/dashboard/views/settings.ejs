@@ -1,0 +1,39 @@
+<h1>Configuration du serveur : <%= guild.name %>
+</h1>
+
+<div class="card">
+    <form action="/dashboard/<%= guild.id %>" method="POST">
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Canal de Logs (ID)</label>
+            <input type="text" name="logChannelId" value="<%= config.logChannelId || '' %>"
+                style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            <small style="color: #aaa;">ID du salon où envoyer les logs (messages supprimés, etc.)</small>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Canal de Bienvenue/Départ
+                (ID)</label>
+            <input type="text" name="welcomeChannelId" value="<%= config.welcomeChannelId || '' %>"
+                style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            <small style="color: #aaa;">ID du salon où envoyer les images de bienvenue et messages de départ</small>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Auto-Rôle (ID)</label>
+            <input type="text" name="autoRole" value="<%= config.autoRole || '' %>"
+                style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            <small style="color: #aaa;">ID du rôle à donner automatiquement aux nouveaux membres</small>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Catégorie Tickets (ID)</label>
+            <input type="text" name="ticketCategoryId" value="<%= config.ticketCategoryId || '' %>"
+                style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            <small style="color: #aaa;">ID de la catégorie où créer les tickets</small>
+        </div>
+
+        <button type="submit" class="btn">Sauvegarder</button>
+    </form>
+</div>
+
+<a href="/dashboard" class="btn btn-secondary">Retour</a>

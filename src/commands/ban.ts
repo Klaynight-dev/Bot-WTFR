@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
-import { makeEmbed, sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond'
+import { sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond'
+import { createEmbed, createErrorEmbed, createSuccessEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('ban')
@@ -15,15 +16,26 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   console.log(`[cmd:ban] /ban by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} reason=${reason}`)
 
   const secret = interaction.options.getBoolean('secret') ?? false
-  if (!interaction.guild) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Commande utilisable uniquement en serveur.', color: 0xFF0000 }))
+  if (!interaction.guild) return replyEphemeralEmbed(interaction, createErrorEmbed('Commande utilisable uniquement en serveur.'))
 
   try {
     // use guild ban via members manager
     await (interaction.guild.members as any).ban(user.id, { reason })
-    const embed = makeEmbed({ title: 'Bannissement', description: `<@${user.id}> banni.`, color: 0xFF0000, fields: [{ name: 'Raison', value: reason }, { name: 'Modérateur', value: `<@${interaction.user.id}>` }] })
+
+    const embed = createEmbed({
+      title: `${Emojis.Error} Bannissement`, // Red icon for ban usually
+      description: `<@${user.id}> a été banni.`,
+      color: Colors.Error,
+      fields: [
+        { name: 'Raison', value: reason },
+        { name: 'Modérateur', value: `<@${interaction.user.id}>` }
+      ],
+      footer: 'Sanction'
+    })
+
     await sendPublicOrSecret(interaction, embed, secret)
   } catch (err) {
     console.error(err)
-    return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Impossible de bannir ce membre.', color: 0xFF0000 }))
+    return replyEphemeralEmbed(interaction, createErrorEmbed('Impossible de bannir ce membre (permissions insuffisantes ou rôle trop élevé).'))
   }
 }

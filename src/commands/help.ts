@@ -1,5 +1,6 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
-import { makeEmbed, replyEmbed } from '../functions/respond'
+import { SlashCommandBuilder, ChatInputCommandInteraction, Client, EmbedBuilder } from 'discord.js'
+import { replyEmbed } from '../functions/respond'
+import { createEmbed, createErrorEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('help')
@@ -17,10 +18,12 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
     }
 
     const json = cmd.data?.toJSON ? cmd.data.toJSON() : cmd.data
-    const opts = (json.options || []).map((o: any) => `• \/${json.name} ${o.required ? `**${o.name}**` : o.name} — ${o.description}`).join('\n')
-    const embed = makeEmbed({
-      title: `/${json.name}`,
+    const opts = (json.options || []).map((o: any) => `• \`/${json.name} ${o.required ? `<${o.name}>` : `[${o.name}]`}\` — ${o.description}`).join('\n')
+
+    const embed = createEmbed({
+      title: `❓ Aide : /${json.name}`,
       description: json.description || '—',
+      color: Colors.Info,
       fields: opts ? [{ name: 'Options', value: opts }] : undefined
     })
     return replyEmbed(interaction, embed)
@@ -28,11 +31,19 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
 
   // list all commands
   const lines: string[] = []
-  ;(client as any).commands.forEach((c: any) => {
+  const commands = (client as any).commands
+
+  commands.forEach((c: any) => {
     const json = c.data?.toJSON ? c.data.toJSON() : c.data
-    lines.push(`• /${json.name} — ${json.description || '—'}`)
+    lines.push(`• \`/${json.name}\` — ${json.description || '—'}`)
   })
 
-  const embed = makeEmbed({ title: 'Commandes disponibles', description: lines.join('\n'), type: 'info' })
+  const embed = createEmbed({
+    title: `${Emojis.Info} Commandes disponibles`,
+    description: lines.join('\n'),
+    color: Colors.Info,
+    footer: 'Utilise /help <commande> pour plus de détails.'
+  })
+
   await replyEmbed(interaction, embed)
 }

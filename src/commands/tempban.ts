@@ -1,5 +1,6 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, MessageFlags } from 'discord.js'
-import { makeEmbed, sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond' 
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js'
+import { sendPublicOrSecret, replyEphemeralEmbed } from '../functions/respond'
+import { createEmbed, createErrorEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder()
   .setName('tempban')
@@ -17,11 +18,22 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   console.log(`[cmd:tempban] /tempban by ${interaction.user?.tag || interaction.user?.id} guild=${interaction.guild?.id || 'DM'} target=${user.tag || user.id} minutes=${minutes} reason=${reason}`)
 
   const secret = interaction.options.getBoolean('secret') ?? false
-  if (!interaction.guild) return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Commande utilisable uniquement en serveur.', color: 0xFF0000 }))
+  if (!interaction.guild) return replyEphemeralEmbed(interaction, createErrorEmbed('Commande utilisable uniquement en serveur.'))
 
   try {
     await (interaction.guild.members as any).ban(user.id, { reason })
-    const embed = makeEmbed({ title: 'Bannissement temporaire', description: `<@${user.id}> banni pour ${minutes} minute(s).`, color: 0xFF6600, fields: [{ name: 'Raison', value: reason }, { name: 'Modérateur', value: `<@${interaction.user.id}>` }] })
+
+    const embed = createEmbed({
+      title: `${Emojis.Warning} Bannissement temporaire`,
+      description: `<@${user.id}> banni pour ${minutes} minute(s).`,
+      color: Colors.Warning, // Orange because temp
+      fields: [
+        { name: 'Raison', value: reason },
+        { name: 'Modérateur', value: `<@${interaction.user.id}>` }
+      ],
+      footer: 'Sanction temporaire'
+    })
+
     await sendPublicOrSecret(interaction, embed, secret)
 
     const ms = minutes * 60 * 1000
@@ -35,6 +47,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     }, ms)
   } catch (err) {
     console.error(err)
-    return replyEphemeralEmbed(interaction, makeEmbed({ title: 'Erreur', description: 'Impossible de bannir ce membre.', color: 0xFF0000 }))
+    return replyEphemeralEmbed(interaction, createErrorEmbed('Impossible de bannir ce membre.'))
   }
 }

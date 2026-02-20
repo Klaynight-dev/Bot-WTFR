@@ -1,0 +1,16 @@
+<div class="card" style="text-align: center; padding: 4rem 2rem;">
+    <h1>Bienvenue sur le Dashboard WarBot FR</h1>
+    <p>Gérez votre serveur et le bot facilement depuis cette interface.</p>
+
+    <% if (!user) { %>
+        <div style="margin-top: 2rem;">
+            <a href="/auth/discord" class="btn" style="font-size: 1.2rem; padding: 0.75rem 2rem;">Se connecter avec
+                Discord</a>
+        </div>
+        <% } else { %>
+            <div style="margin-top: 2rem;">
+                <a href="/dashboard" class="btn" style="font-size: 1.2rem; padding: 0.75rem 2rem;">Accéder au
+                    Dashboard</a>
+            </div>
+            <% } %>
+</div>

@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js'
-import { makeEmbed, replyEphemeralEmbed } from '../functions/respond'
+import { replyEphemeralEmbed } from '../functions/respond'
+import { createEmbed, Colors, Emojis } from '../utils/style'
 
 export const data = new SlashCommandBuilder().setName('ping').setDescription('Retourne la latence du bot')
 
@@ -8,8 +9,9 @@ export async function execute(interaction: ChatInputCommandInteraction, client: 
   const apiLatency = Math.round((client as any).ws?.ping ?? 0)
   const roundtrip = Date.now() - interaction.createdTimestamp
 
-  const embed = makeEmbed({
+  const embed = createEmbed({
     title: 'Pong! 🏓',
+    color: Colors.Primary,
     fields: [
       { name: 'API', value: `${apiLatency} ms`, inline: true },
       { name: 'Réponse', value: `${roundtrip} ms`, inline: true }
