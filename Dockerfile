@@ -19,6 +19,8 @@ RUN npx prisma generate
 
 RUN pnpm run build
 
+RUN mkdir -p dist/dashboard/views && cp -r src/dashboard/views/* dist/dashboard/views/
+
 FROM node:20-alpine AS runner
 
 WORKDIR /app
