@@ -3,7 +3,6 @@ import prisma from '../../prisma'
 
 const router = Router()
 
-// Middleware to check if logged in
 function checkAuth(req: any, res: any, next: any) {
     if (req.isAuthenticated()) return next()
     res.redirect('/')
@@ -14,8 +13,7 @@ router.get('/', (req, res) => {
 })
 
 router.get('/dashboard', checkAuth, async (req: any, res) => {
-    const guildConfig = await prisma.guildConfig.findMany() // Fetch all configs or just relevant ones
-    // For now, simple dashboard
+    const guildConfig = await prisma.guildConfig.findMany()
     res.render('dashboard', { user: req.user, guildConfig })
 })
 
@@ -25,9 +23,6 @@ router.get('/dashboard/:guildId', checkAuth, async (req: any, res) => {
     const guild = req.bot.guilds.cache.get(guildId)
 
     if (!guild) return res.send("Serveur introuvable ou le bot n'y est pas.")
-
-    // Check permissions (simple check: must be owner or admin)
-    // In real app, check Discord permissions via API or bot cache
 
     res.render('settings', { user: req.user, guild, config: guildConfig || {} })
 })
