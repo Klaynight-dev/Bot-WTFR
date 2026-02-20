@@ -37,7 +37,7 @@ COPY prisma ./prisma
 RUN pnpm config set only-built-dependencies canvas prisma @prisma/engines \
     && pnpm install --no-frozen-lockfile --prod=false \
     && npx prisma generate \
-    && pnpm prune --prod --no-scripts
+    && pnpm prune --prod --ignore-scripts
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/scripts ./scripts
